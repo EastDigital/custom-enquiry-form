@@ -68,6 +68,9 @@ const Index = () => {
           </div>
         </div>
       </div>
+      
+      {/* Script tag for GPT Engineer integration with WordPress */}
+      <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
     </div>
   );
 };
