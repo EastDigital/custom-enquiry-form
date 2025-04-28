@@ -44,9 +44,12 @@ export const generateCustomerEmailHTML = (
   name: string,
   email: string,
   phone: string,
-  selectedServices: ServiceSelection[]
+  selectedServices: ServiceSelection[],
+  urgent: boolean = false
 ) => {
   const total = calculateTotal(selectedServices);
+  const urgencyBadgeColor = urgent ? "#ff6900" : "#4ade80";
+  const urgencyText = urgent ? "Urgent" : "Not So Urgent";
   
   return `
     <!DOCTYPE html>
@@ -55,11 +58,19 @@ export const generateCustomerEmailHTML = (
         <style>
           body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
           .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background: linear-gradient(to right, #7c3aed, #3b82f6); padding: 20px; color: white; text-align: center; }
+          .header { background: linear-gradient(to right, #ff6900, #ff8533); padding: 20px; color: white; text-align: center; }
           .content { padding: 20px; }
           table { width: 100%; border-collapse: collapse; margin-top: 20px; }
           th { background-color: #f8fafc; padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0; }
           .total { font-weight: bold; margin-top: 20px; text-align: right; }
+          .urgency-badge { 
+            display: inline-block;
+            background-color: ${urgencyBadgeColor}; 
+            color: white; 
+            padding: 5px 10px; 
+            border-radius: 20px; 
+            font-size: 12px;
+          }
         </style>
       </head>
       <body>
@@ -70,6 +81,10 @@ export const generateCustomerEmailHTML = (
           <div class="content">
             <p>Dear ${name},</p>
             <p>Thank you for requesting a quote. Here are the details of your quotation:</p>
+            
+            <div style="margin: 15px 0; padding: 10px; background-color: #f8fafc; border-radius: 8px;">
+              <p><strong>Urgency Level:</strong> <span class="urgency-badge">${urgencyText}</span></p>
+            </div>
             
             <h3>Services Selected:</h3>
             <table>
@@ -103,9 +118,12 @@ export const generateAdminEmailHTML = (
   customerName: string,
   customerEmail: string,
   customerPhone: string,
-  selectedServices: ServiceSelection[]
+  selectedServices: ServiceSelection[],
+  urgent: boolean = false
 ) => {
   const total = calculateTotal(selectedServices);
+  const urgencyBadgeColor = urgent ? "#ff6900" : "#4ade80";
+  const urgencyText = urgent ? "Urgent" : "Not So Urgent";
   
   return `
     <!DOCTYPE html>
@@ -114,11 +132,19 @@ export const generateAdminEmailHTML = (
         <style>
           body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
           .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background: linear-gradient(to right, #7c3aed, #3b82f6); padding: 20px; color: white; text-align: center; }
+          .header { background: linear-gradient(to right, #ff6900, #ff8533); padding: 20px; color: white; text-align: center; }
           .content { padding: 20px; }
           table { width: 100%; border-collapse: collapse; margin-top: 20px; }
           th { background-color: #f8fafc; padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0; }
           .customer-info { background-color: #f8fafc; padding: 15px; border-radius: 8px; margin: 20px 0; }
+          .urgency-badge { 
+            display: inline-block;
+            background-color: ${urgencyBadgeColor}; 
+            color: white; 
+            padding: 5px 10px; 
+            border-radius: 20px; 
+            font-size: 12px;
+          }
         </style>
       </head>
       <body>
@@ -132,6 +158,7 @@ export const generateAdminEmailHTML = (
               <p><strong>Name:</strong> ${customerName}</p>
               <p><strong>Email:</strong> ${customerEmail}</p>
               <p><strong>Phone:</strong> ${customerPhone}</p>
+              <p><strong>Urgency Level:</strong> <span class="urgency-badge">${urgencyText}</span></p>
             </div>
             
             <h3>Selected Services:</h3>

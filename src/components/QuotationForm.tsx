@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { serviceCategories } from "@/data/servicesData";
 import { CustomerFormData, ServiceSelection } from "@/types/form";
@@ -5,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { X } from "lucide-react";
 import { sendQuotationEmails } from '@/utils/supabaseEmail';
@@ -14,6 +16,7 @@ const initialFormData: CustomerFormData = {
   email: "",
   phone: "",
   selectedServices: [],
+  urgent: false,
 };
 
 const QuotationForm = () => {
@@ -28,6 +31,13 @@ const QuotationForm = () => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleUrgentChange = (checked: boolean) => {
+    setFormData({
+      ...formData,
+      urgent: checked,
     });
   };
 
@@ -217,6 +227,20 @@ const QuotationForm = () => {
                   required
                 />
               </div>
+
+              <div className="flex items-center justify-between mt-4 pt-2 border-t">
+                <div className="space-y-0.5">
+                  <Label htmlFor="urgent-mode" className="form-label">Urgency Level</Label>
+                  <p className="text-sm text-muted-foreground">
+                    {formData.urgent ? "Urgent" : "Not So Urgent"}
+                  </p>
+                </div>
+                <Switch
+                  id="urgent-mode"
+                  checked={formData.urgent}
+                  onCheckedChange={handleUrgentChange}
+                />
+              </div>
             </div>
           </div>
         );
@@ -348,6 +372,10 @@ const QuotationForm = () => {
                 <div className="col-span-2">
                   <span className="text-sm text-muted-foreground">Email:</span>
                   <p>{formData.email}</p>
+                </div>
+                <div className="col-span-2">
+                  <span className="text-sm text-muted-foreground">Urgency:</span>
+                  <p>{formData.urgent ? "Urgent" : "Not So Urgent"}</p>
                 </div>
               </div>
             </div>
@@ -493,7 +521,7 @@ const QuotationForm = () => {
           </div>
         )}
 
-        <div className="bg-white rounded-lg p-6 shadow-sm border">
+        <div className="bg-card rounded-lg p-6 shadow-sm border">
           {showFinalOptions ? renderQuoteOptions() : renderStep()}
           
           {!showFinalOptions && (

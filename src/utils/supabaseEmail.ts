@@ -13,17 +13,20 @@ export const sendQuotationEmails = async (formData: CustomerFormData) => {
         customerName: formData.name,
         customerPhone: formData.phone,
         selectedServices: formData.selectedServices,
+        urgent: formData.urgent,
         customerTemplate: generateCustomerEmailHTML(
           formData.name,
           formData.email,
           formData.phone,
-          formData.selectedServices
+          formData.selectedServices,
+          formData.urgent
         ),
         adminTemplate: generateAdminEmailHTML(
           formData.name,
           formData.email,
           formData.phone,
-          formData.selectedServices
+          formData.selectedServices,
+          formData.urgent
         )
       }
     });
