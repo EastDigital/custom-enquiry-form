@@ -10,4 +10,5 @@ export type CustomerFormData = {
   email: string;
   phone: string;
   selectedServices: ServiceSelection[];
+  urgent: boolean;
 };
