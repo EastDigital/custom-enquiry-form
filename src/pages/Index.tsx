@@ -15,8 +15,8 @@ const Index = () => {
           </p>
         </div>
         
-        <div className="flex flex-col md:flex-row gap-8 max-w-6xl mx-auto">
-          <div className="md:w-1/2">
+        <div className="flex flex-col-reverse md:flex-row gap-8 max-w-6xl mx-auto">
+          <div className="md:w-1/2 md:mt-10">
             <h2 className="text-2xl font-semibold mb-8">Our Services</h2>
             <div className="grid gap-6">
               <div className="bg-card p-6 rounded-lg shadow-sm border hover:shadow-md transition-shadow">
@@ -62,7 +62,9 @@ const Index = () => {
           </div>
           
           <div className="md:w-1/2">
-            <QuotationForm />
+            <div className="bg-gradient-to-br from-primary/5 to-primary/20 p-6 rounded-lg shadow-lg border-2 border-primary/20">
+              <QuotationForm />
+            </div>
           </div>
         </div>
       </div>
