@@ -1,578 +1,104 @@
 
-import React, { useState } from "react";
-import { serviceCategories } from "@/data/servicesData";
-import { CustomerFormData, ServiceSelection } from "@/types/form";
+import React from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
-import { toast } from "sonner";
-import { X } from "lucide-react";
-import { sendQuotationEmails } from '@/utils/supabaseEmail';
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { useQuotationForm } from "@/hooks/useQuotationForm";
 
-const initialFormData: CustomerFormData = {
-  name: "",
-  email: "",
-  phone: "",
-  selectedServices: [],
-  urgent: false,
-};
+// Import refactored components
+import PersonalInfoStep from "./quotation/PersonalInfoStep";
+import ServicesSelectionStep from "./quotation/ServicesSelectionStep";
+import QuoteSummaryStep from "./quotation/QuoteSummaryStep";
+import QuoteOptions from "./quotation/QuoteOptions";
+import ConfirmationMessage from "./quotation/ConfirmationMessage";
+import StepIndicator from "./quotation/StepIndicator";
 
 const QuotationForm = () => {
-  const [formData, setFormData] = useState<CustomerFormData>(initialFormData);
-  const [currentStep, setCurrentStep] = useState(0);
-  const [selectedServiceId, setSelectedServiceId] = useState<string | null>(null);
-  const [showFinalOptions, setShowFinalOptions] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [countdown, setCountdown] = useState(10);
-  const [showConfirmation, setShowConfirmation] = useState(false);
-
-  const handlePersonalInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleUrgentChange = (checked: boolean) => {
-    setFormData({
-      ...formData,
-      urgent: checked,
-    });
-  };
-
-  const handleServiceCategoryChange = (value: string) => {
-    setSelectedServiceId(value);
-  };
-
-  const handleSubServiceChange = (serviceId: string, subServiceId: string) => {
-    const existingService = formData.selectedServices.find(
-      (s) => s.serviceId === serviceId && s.subServiceId === subServiceId
-    );
-    
-    if (existingService) {
-      removeService(serviceId, subServiceId);
-    } else {
-      const serviceCategory = serviceCategories.find((sc) => sc.id === serviceId);
-      const subService = serviceCategory?.subServices.find((ss) => ss.id === subServiceId);
-      
-      if (serviceCategory && subService) {
-        let newServices = [...formData.selectedServices];
-        
-        const quantity = subService.minimumUnits || undefined;
-        
-        newServices.push({
-          serviceId,
-          subServiceId,
-          quantity,
-        });
-        
-        setFormData({
-          ...formData,
-          selectedServices: newServices,
-        });
-      }
-    }
-  };
-
-  const removeService = (serviceId: string, subServiceId: string) => {
-    setFormData({
-      ...formData,
-      selectedServices: formData.selectedServices.filter(
-        (s) => !(s.serviceId === serviceId && s.subServiceId === subServiceId)
-      ),
-    });
-  };
-
-  const handleQuantityChange = (serviceId: string, subServiceId: string, quantity: number) => {
-    const serviceCategory = serviceCategories.find((sc) => sc.id === serviceId);
-    const subService = serviceCategory?.subServices.find((ss) => ss.id === subServiceId);
-    
-    if (subService?.minimumUnits && quantity < subService.minimumUnits) {
-      quantity = subService.minimumUnits;
-    }
-    
-    setFormData({
-      ...formData,
-      selectedServices: formData.selectedServices.map((service) => {
-        if (service.serviceId === serviceId && service.subServiceId === subServiceId) {
-          return { ...service, quantity };
-        }
-        return service;
-      }),
-    });
-  };
-
-  const isServiceSelected = (serviceId: string, subServiceId: string) => {
-    return formData.selectedServices.some(
-      (s) => s.serviceId === serviceId && s.subServiceId === subServiceId
-    );
-  };
-
-  const calculateTotal = () => {
-    let total = 0;
-    
-    formData.selectedServices.forEach((service) => {
-      const serviceCategory = serviceCategories.find((sc) => sc.id === service.serviceId);
-      const subService = serviceCategory?.subServices.find((ss) => ss.id === service.subServiceId);
-      
-      if (subService) {
-        if (service.quantity && subService.unit) {
-          total += subService.price * service.quantity;
-        } else {
-          total += subService.price;
-        }
-      }
-    });
-    
-    return total;
-  };
-
-  const nextStep = () => {
-    if (currentStep === 0) {
-      if (!formData.name.trim() || !formData.email.trim() || !formData.phone.trim()) {
-        toast.error("Please fill in all required fields");
-        return;
-      }
-      
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(formData.email)) {
-        toast.error("Please enter a valid email address");
-        return;
-      }
-      
-      setCurrentStep(1);
-    } else if (currentStep === 1) {
-      if (formData.selectedServices.length === 0) {
-        toast.error("Please select at least one service");
-        return;
-      }
-      
-      setCurrentStep(2);
-    } else if (currentStep === 2) {
-      setShowFinalOptions(true);
-    }
-  };
-
-  const prevStep = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
-
-  const handleSubmit = async (paidOption: boolean) => {
-    setSubmitting(true);
-    
-    try {
-      if (paidOption) {
-        toast.success("Payment successful! Your quote has been sent to your email.");
-      }
-      
-      await sendQuotationEmails(formData);
-      toast.success("Your quote has been sent to your email!");
-      
-      setShowConfirmation(true);
-      setShowFinalOptions(false);
-      
-      setTimeout(() => {
-        setFormData(initialFormData);
-        setCurrentStep(0);
-        setSelectedServiceId(null);
-        setShowConfirmation(false);
-      }, 10000);
-      
-    } catch (error) {
-      console.error('Error:', error);
-      toast.error("There was an error processing your request. Please try again.");
-    } finally {
-      setSubmitting(false);
-    }
-  };
+  const {
+    formData,
+    currentStep,
+    selectedServiceId,
+    showFinalOptions,
+    submitting,
+    countdown,
+    showConfirmation,
+    handlePersonalInfoChange,
+    handleUrgentChange,
+    handleServiceCategoryChange,
+    handleSubServiceChange,
+    removeService,
+    handleQuantityChange,
+    isServiceSelected,
+    nextStep,
+    prevStep,
+    handleSubmit,
+  } = useQuotationForm();
 
   const renderStep = () => {
     switch (currentStep) {
       case 0:
         return (
-          <div className="space-y-4">
-            <h2 className="text-2xl font-semibold text-center">Personal Information</h2>
-            
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="name" className="form-label">Full Name*</Label>
-                <Input
-                  id="name"
-                  name="name"
-                  className="form-input mt-1"
-                  placeholder="John Doe"
-                  value={formData.name}
-                  onChange={handlePersonalInfoChange}
-                  required
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="email" className="form-label">Email Address*</Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  className="form-input mt-1"
-                  placeholder="john@example.com"
-                  value={formData.email}
-                  onChange={handlePersonalInfoChange}
-                  required
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="phone" className="form-label">Phone Number*</Label>
-                <Input
-                  id="phone"
-                  name="phone"
-                  type="tel"
-                  className="form-input mt-1"
-                  placeholder="+1 (555) 123-4567"
-                  value={formData.phone}
-                  onChange={handlePersonalInfoChange}
-                  required
-                />
-              </div>
-
-              <div className="flex items-center justify-between mt-4 pt-2 border-t">
-                <div className="space-y-0.5">
-                  <Label htmlFor="urgent-mode" className="form-label">Urgency Level</Label>
-                  <p className="text-sm text-muted-foreground">
-                    {formData.urgent ? "Urgent" : "Not So Urgent"}
-                  </p>
-                </div>
-                <Switch
-                  id="urgent-mode"
-                  checked={formData.urgent}
-                  onCheckedChange={handleUrgentChange}
-                />
-              </div>
-            </div>
-          </div>
+          <PersonalInfoStep
+            formData={formData}
+            handlePersonalInfoChange={handlePersonalInfoChange}
+            handleUrgentChange={handleUrgentChange}
+          />
         );
         
       case 1:
         return (
-          <div className="space-y-4">
-            <h2 className="text-2xl font-semibold text-center">Select Services</h2>
-            
-            <div>
-              <Label htmlFor="serviceCategory" className="form-label">Service Category*</Label>
-              <Select onValueChange={handleServiceCategoryChange} value={selectedServiceId || undefined}>
-                <SelectTrigger className="form-dropdown mt-1">
-                  <SelectValue placeholder="Select a service category" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    {serviceCategories.map((category) => (
-                      <SelectItem key={category.id} value={category.id}>
-                        {category.name}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            {selectedServiceId && (
-              <div className="mt-4 space-y-4">
-                <Label className="form-label">Sub-services</Label>
-                <div className="grid gap-3">
-                  {serviceCategories
-                    .find((c) => c.id === selectedServiceId)
-                    ?.subServices.map((subService) => (
-                      <div key={subService.id} className="flex flex-col space-y-2">
-                        <div 
-                          className="flex items-center justify-between border rounded-md p-3 hover:bg-secondary/50 cursor-pointer"
-                          onClick={() => handleSubServiceChange(selectedServiceId, subService.id)}
-                        >
-                          <span className="font-medium">{subService.name}</span>
-                          <div className={`w-6 h-6 rounded-md flex items-center justify-center border ${
-                            isServiceSelected(selectedServiceId, subService.id) 
-                              ? 'bg-primary text-white border-primary' 
-                              : 'bg-background border-input'
-                          }`}>
-                            {isServiceSelected(selectedServiceId, subService.id) && "✓"}
-                          </div>
-                        </div>
-                        
-                        {isServiceSelected(selectedServiceId, subService.id) && subService.unit && (
-                          <div className="flex items-center ml-2 space-x-2">
-                            <Label htmlFor={`quantity-${subService.id}`} className="form-label whitespace-nowrap">
-                              {subService.unit === "per minute" ? "Minutes:" : "Quantity:"}
-                            </Label>
-                            <Input
-                              id={`quantity-${subService.id}`}
-                              type="number"
-                              className="form-input w-24"
-                              min={subService.minimumUnits || 1}
-                              value={formData.selectedServices.find(
-                                (s) => s.serviceId === selectedServiceId && s.subServiceId === subService.id
-                              )?.quantity || subService.minimumUnits || 1}
-                              onChange={(e) => 
-                                handleQuantityChange(
-                                  selectedServiceId, 
-                                  subService.id, 
-                                  parseInt(e.target.value) || subService.minimumUnits || 1
-                                )
-                              }
-                            />
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                </div>
-              </div>
-            )}
-            
-            {formData.selectedServices.length > 0 && (
-              <div className="p-4 border rounded-md mt-6">
-                <h3 className="font-semibold mb-2">Selected Services:</h3>
-                <ul className="space-y-2">
-                  {formData.selectedServices.map((service) => {
-                    const serviceCategory = serviceCategories.find((sc) => sc.id === service.serviceId);
-                    const subService = serviceCategory?.subServices.find((ss) => ss.id === service.subServiceId);
-                    
-                    if (!serviceCategory || !subService) return null;
-                    
-                    return (
-                      <li 
-                        key={`${service.serviceId}-${service.subServiceId}`} 
-                        className="flex justify-between items-center bg-secondary/20 p-2 rounded-md"
-                      >
-                        <span>
-                          {serviceCategory.name}: {subService.name}
-                          {service.quantity && subService.unit && ` (${service.quantity} ${subService.unit.replace('per ', '')})`}
-                        </span>
-                        <button
-                          onClick={() => removeService(service.serviceId, service.subServiceId)}
-                          className="p-1 hover:bg-secondary rounded-full"
-                        >
-                          <X size={16} className="text-muted-foreground" />
-                        </button>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-            )}
-          </div>
+          <ServicesSelectionStep
+            formData={formData}
+            selectedServiceId={selectedServiceId}
+            handleServiceCategoryChange={handleServiceCategoryChange}
+            handleSubServiceChange={handleSubServiceChange}
+            handleQuantityChange={handleQuantityChange}
+            removeService={removeService}
+            isServiceSelected={isServiceSelected}
+          />
         );
         
       case 2:
-        return (
-          <div className="space-y-4">
-            <h2 className="text-2xl font-semibold text-center">Quote Summary</h2>
-            
-            <div className="border rounded-md p-4 bg-secondary/30">
-              <h3 className="font-semibold mb-2">Customer Information</h3>
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <span className="text-sm text-muted-foreground">Name:</span>
-                  <p>{formData.name}</p>
-                </div>
-                <div>
-                  <span className="text-sm text-muted-foreground">Phone:</span>
-                  <p>{formData.phone}</p>
-                </div>
-                <div className="col-span-2">
-                  <span className="text-sm text-muted-foreground">Email:</span>
-                  <p>{formData.email}</p>
-                </div>
-                <div className="col-span-2">
-                  <span className="text-sm text-muted-foreground">Urgency:</span>
-                  <p>{formData.urgent ? "Urgent" : "Not So Urgent"}</p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="border rounded-md p-4 bg-secondary/30">
-              <h3 className="font-semibold mb-2">Selected Services</h3>
-              <ul className="space-y-2">
-                {formData.selectedServices.map((service) => {
-                  const serviceCategory = serviceCategories.find((sc) => sc.id === service.serviceId);
-                  const subService = serviceCategory?.subServices.find((ss) => ss.id === service.subServiceId);
-                  
-                  if (!serviceCategory || !subService) return null;
-                  
-                  return (
-                    <li key={`${service.serviceId}-${service.subServiceId}`} className="flex justify-between">
-                      <span>
-                        {serviceCategory.name}: {subService.name}
-                        {service.quantity && subService.unit && ` (${service.quantity} ${subService.unit.replace('per ', '')})`}
-                      </span>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          </div>
-        );
+        return <QuoteSummaryStep formData={formData} />;
         
       default:
         return null;
     }
   };
 
-  const renderQuoteOptions = () => {
-    if (!showFinalOptions) return null;
-    
-    if (submitting) {
-      return (
-        <div className="text-center p-8">
-          <div className="animate-pulse-light mb-4">
-            <h3 className="text-xl font-semibold mb-2">Processing your quote...</h3>
-            
-            {countdown > 0 && (
-              <div className="mt-4">
-                <p>Your quote will be delivered in:</p>
-                <p className="text-3xl font-bold text-primary">{countdown} seconds</p>
-              </div>
-            )}
-          </div>
-        </div>
-      );
-    }
-    
-    return (
-      <div className="p-6 border rounded-md">
-        <h3 className="text-xl font-semibold mb-4 text-center">Choose an Option</h3>
-        
-        <div className="grid md:grid-cols-2 gap-4">
-          <div 
-            className="p-4 border rounded-md hover:shadow-md transition-shadow cursor-pointer bg-secondary/30"
-            onClick={() => handleSubmit(false)}
-          >
-            <div className="text-center mb-3">
-              <span className="inline-block p-2 rounded-full bg-secondary">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="10" />
-                  <polyline points="12 6 12 12 16 14" />
-                </svg>
-              </span>
-            </div>
-            <h4 className="font-semibold text-center">Free Quote</h4>
-            <p className="text-center text-sm text-muted-foreground">
-              Wait 10 minutes to receive your quote via email
-            </p>
-          </div>
-          
-          <div 
-            className="p-4 border rounded-md hover:shadow-md transition-shadow cursor-pointer bg-primary/10"
-            onClick={() => handleSubmit(true)}
-          >
-            <div className="text-center mb-3">
-              <span className="inline-block p-2 rounded-full bg-primary/20">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="10" />
-                  <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8" />
-                  <path d="M12 18V6" />
-                </svg>
-              </span>
-            </div>
-            <h4 className="font-semibold text-center">Instant Quote - $10</h4>
-            <p className="text-center text-sm text-muted-foreground">
-              Get your detailed quote delivered instantly
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  const renderConfirmationMessage = () => {
-    if (!showConfirmation) return null;
-
-    return (
-      <Alert className="bg-primary/10 border-primary border-2 shadow-lg animate-in fade-in duration-300">
-        <AlertTitle className="text-xl font-bold text-center text-foreground mb-2">
-          Quote Request Submitted
-        </AlertTitle>
-        <AlertDescription className="text-center text-foreground">
-          <p className="mb-4 text-lg">
-            You will receive email shortly. Check your spam or junk folder if you did not receive it in your Inbox.
-          </p>
-          <p className="text-sm text-muted-foreground">
-            Thank you for submitting your quote request. Our team is working on it!
-          </p>
-        </AlertDescription>
-      </Alert>
-    );
-  };
-
   return (
     <div className="max-w-2xl mx-auto p-4">
       <div className="mb-8">
         {showConfirmation ? (
-          renderConfirmationMessage()
+          <ConfirmationMessage show={showConfirmation} />
         ) : (
           <>
             {!showFinalOptions && (
-              <div className="mb-6">
-                <div className="flex items-center">
-                  <div className="flex-1 flex">
-                    {[0, 1, 2].map((step) => (
-                      <React.Fragment key={step}>
-                        <div className="flex items-center">
-                          <div
-                            className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                              currentStep >= step
-                                ? "bg-primary text-primary-foreground"
-                                : "bg-muted text-muted-foreground"
-                            }`}
-                          >
-                            {step + 1}
-                          </div>
-                          <span
-                            className={`ml-2 text-sm ${
-                              currentStep === step ? "font-medium" : "text-muted-foreground"
-                            } hidden sm:inline`}
-                          >
-                            {step === 0
-                              ? "Personal Info"
-                              : step === 1
-                              ? "Services"
-                              : "Summary"}
-                          </span>
-                        </div>
-                        {step < 2 && (
-                          <div className="flex-1 mx-2 h-0.5 self-center bg-muted">
-                            <div
-                              className={`h-0.5 bg-primary ${
-                                currentStep > step ? "w-full" : "w-0"
-                              } transition-all duration-500`}
-                            ></div>
-                          </div>
-                        )}
-                      </React.Fragment>
-                    ))}
-                  </div>
-                </div>
-              </div>
+              <StepIndicator currentStep={currentStep} totalSteps={3} />
             )}
 
             <div className="bg-card rounded-lg p-6 shadow-sm border">
-              {showFinalOptions ? renderQuoteOptions() : renderStep()}
-              
-              {!showFinalOptions && (
-                <div className="mt-6 flex justify-between">
-                  {currentStep > 0 ? (
-                    <Button variant="outline" onClick={prevStep}>
-                      Back
+              {showFinalOptions ? (
+                <QuoteOptions
+                  submitting={submitting}
+                  countdown={countdown}
+                  handleSubmit={handleSubmit}
+                />
+              ) : (
+                <>
+                  {renderStep()}
+                  
+                  <div className="mt-6 flex justify-between">
+                    {currentStep > 0 ? (
+                      <Button variant="outline" onClick={prevStep}>
+                        Back
+                      </Button>
+                    ) : (
+                      <div></div>
+                    )}
+                    <Button onClick={nextStep}>
+                      {currentStep === 2 ? "Get Quote" : "Next"}
                     </Button>
-                  ) : (
-                    <div></div>
-                  )}
-                  <Button onClick={nextStep}>
-                    {currentStep === 2 ? "Get Quote" : "Next"}
-                  </Button>
-                </div>
+                  </div>
+                </>
               )}
             </div>
           </>
