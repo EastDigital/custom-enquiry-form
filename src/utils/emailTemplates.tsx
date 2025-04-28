@@ -2,7 +2,10 @@
 import { ServiceSelection } from "@/types/form";
 import { serviceCategories } from "@/data/servicesData";
 
-const calculateTotal = (selectedServices: ServiceSelection[]) => {
+// Define the urgency fee
+const URGENCY_FEE = 25;
+
+const calculateTotal = (selectedServices: ServiceSelection[], urgent: boolean = false) => {
   let total = 0;
   selectedServices.forEach((service) => {
     const category = serviceCategories.find((c) => c.id === service.serviceId);
@@ -15,6 +18,12 @@ const calculateTotal = (selectedServices: ServiceSelection[]) => {
       }
     }
   });
+  
+  // Add urgency fee if urgent
+  if (urgent) {
+    total += URGENCY_FEE;
+  }
+  
   return total;
 };
 
@@ -47,7 +56,7 @@ export const generateCustomerEmailHTML = (
   selectedServices: ServiceSelection[],
   urgent: boolean = false
 ) => {
-  const total = calculateTotal(selectedServices);
+  const total = calculateTotal(selectedServices, urgent);
   const urgencyBadgeColor = urgent ? "#ff6900" : "#4ade80";
   const urgencyText = urgent ? "Urgent" : "Not So Urgent";
   
@@ -97,6 +106,13 @@ export const generateCustomerEmailHTML = (
               </thead>
               <tbody>
                 ${formatServicesList(selectedServices)}
+                ${urgent ? `
+                <tr>
+                  <td style="padding: 12px; border-bottom: 1px solid #e2e8f0;"><strong>Urgency Fee</strong></td>
+                  <td style="padding: 12px; border-bottom: 1px solid #e2e8f0;">1</td>
+                  <td style="padding: 12px; border-bottom: 1px solid #e2e8f0;">$${URGENCY_FEE}</td>
+                </tr>
+                ` : ''}
               </tbody>
             </table>
             
@@ -121,7 +137,7 @@ export const generateAdminEmailHTML = (
   selectedServices: ServiceSelection[],
   urgent: boolean = false
 ) => {
-  const total = calculateTotal(selectedServices);
+  const total = calculateTotal(selectedServices, urgent);
   const urgencyBadgeColor = urgent ? "#ff6900" : "#4ade80";
   const urgencyText = urgent ? "Urgent" : "Not So Urgent";
   
@@ -172,6 +188,13 @@ export const generateAdminEmailHTML = (
               </thead>
               <tbody>
                 ${formatServicesList(selectedServices)}
+                ${urgent ? `
+                <tr>
+                  <td style="padding: 12px; border-bottom: 1px solid #e2e8f0;"><strong>Urgency Fee</strong></td>
+                  <td style="padding: 12px; border-bottom: 1px solid #e2e8f0;">1</td>
+                  <td style="padding: 12px; border-bottom: 1px solid #e2e8f0;">$${URGENCY_FEE}</td>
+                </tr>
+                ` : ''}
               </tbody>
             </table>
             
