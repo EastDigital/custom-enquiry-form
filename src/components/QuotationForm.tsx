@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { serviceCategories } from "@/data/servicesData";
 import { CustomerFormData, ServiceSelection } from "@/types/form";
@@ -10,6 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { X } from "lucide-react";
 import { sendQuotationEmails } from '@/utils/supabaseEmail';
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 
 const initialFormData: CustomerFormData = {
   name: "",
@@ -26,6 +26,7 @@ const QuotationForm = () => {
   const [showFinalOptions, setShowFinalOptions] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [countdown, setCountdown] = useState(10);
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
   const handlePersonalInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -171,11 +172,15 @@ const QuotationForm = () => {
       await sendQuotationEmails(formData);
       toast.success("Your quote has been sent to your email!");
       
-      // Reset form after successful submission
-      setFormData(initialFormData);
-      setCurrentStep(0);
-      setSelectedServiceId(null);
+      setShowConfirmation(true);
       setShowFinalOptions(false);
+      
+      setTimeout(() => {
+        setFormData(initialFormData);
+        setCurrentStep(0);
+        setSelectedServiceId(null);
+        setShowConfirmation(false);
+      }, 10000);
       
     } catch (error) {
       console.error('Error:', error);
@@ -480,71 +485,97 @@ const QuotationForm = () => {
     );
   };
 
+  const renderConfirmationMessage = () => {
+    if (!showConfirmation) return null;
+
+    return (
+      <Alert className="bg-primary/10 border-primary border-2 shadow-lg animate-in fade-in duration-300">
+        <AlertTitle className="text-xl font-bold text-center text-foreground mb-2">
+          Quote Request Submitted
+        </AlertTitle>
+        <AlertDescription className="text-center text-foreground">
+          <p className="mb-4 text-lg">
+            You will receive email in about 10 minutes. Check your spam or junk folder if you did not receive it in your Inbox.
+          </p>
+          <p className="text-sm text-muted-foreground">
+            Thank you for submitting your quote request. Our team is working on it!
+          </p>
+        </AlertDescription>
+      </Alert>
+    );
+  };
+
   return (
     <div className="max-w-2xl mx-auto p-4">
       <div className="mb-8">
-        {!showFinalOptions && (
-          <div className="mb-6">
-            <div className="flex items-center">
-              <div className="flex-1 flex">
-                {[0, 1, 2].map((step) => (
-                  <React.Fragment key={step}>
-                    <div className="flex items-center">
-                      <div
-                        className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                          currentStep >= step
-                            ? "bg-primary text-primary-foreground"
-                            : "bg-muted text-muted-foreground"
-                        }`}
-                      >
-                        {step + 1}
-                      </div>
-                      <span
-                        className={`ml-2 text-sm ${
-                          currentStep === step ? "font-medium" : "text-muted-foreground"
-                        } hidden sm:inline`}
-                      >
-                        {step === 0
-                          ? "Personal Info"
-                          : step === 1
-                          ? "Services"
-                          : "Summary"}
-                      </span>
-                    </div>
-                    {step < 2 && (
-                      <div className="flex-1 mx-2 h-0.5 self-center bg-muted">
-                        <div
-                          className={`h-0.5 bg-primary ${
-                            currentStep > step ? "w-full" : "w-0"
-                          } transition-all duration-500`}
-                        ></div>
-                      </div>
-                    )}
-                  </React.Fragment>
-                ))}
+        {showConfirmation ? (
+          renderConfirmationMessage()
+        ) : (
+          <>
+            {!showFinalOptions && (
+              <div className="mb-6">
+                <div className="flex items-center">
+                  <div className="flex-1 flex">
+                    {[0, 1, 2].map((step) => (
+                      <React.Fragment key={step}>
+                        <div className="flex items-center">
+                          <div
+                            className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                              currentStep >= step
+                                ? "bg-primary text-primary-foreground"
+                                : "bg-muted text-muted-foreground"
+                            }`}
+                          >
+                            {step + 1}
+                          </div>
+                          <span
+                            className={`ml-2 text-sm ${
+                              currentStep === step ? "font-medium" : "text-muted-foreground"
+                            } hidden sm:inline`}
+                          >
+                            {step === 0
+                              ? "Personal Info"
+                              : step === 1
+                              ? "Services"
+                              : "Summary"}
+                          </span>
+                        </div>
+                        {step < 2 && (
+                          <div className="flex-1 mx-2 h-0.5 self-center bg-muted">
+                            <div
+                              className={`h-0.5 bg-primary ${
+                                currentStep > step ? "w-full" : "w-0"
+                              } transition-all duration-500`}
+                            ></div>
+                          </div>
+                        )}
+                      </React.Fragment>
+                    ))}
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-        )}
+            )}
 
-        <div className="bg-card rounded-lg p-6 shadow-sm border">
-          {showFinalOptions ? renderQuoteOptions() : renderStep()}
-          
-          {!showFinalOptions && (
-            <div className="mt-6 flex justify-between">
-              {currentStep > 0 ? (
-                <Button variant="outline" onClick={prevStep}>
-                  Back
-                </Button>
-              ) : (
-                <div></div>
+            <div className="bg-card rounded-lg p-6 shadow-sm border">
+              {showFinalOptions ? renderQuoteOptions() : renderStep()}
+              
+              {!showFinalOptions && (
+                <div className="mt-6 flex justify-between">
+                  {currentStep > 0 ? (
+                    <Button variant="outline" onClick={prevStep}>
+                      Back
+                    </Button>
+                  ) : (
+                    <div></div>
+                  )}
+                  <Button onClick={nextStep}>
+                    {currentStep === 2 ? "Get Quote" : "Next"}
+                  </Button>
+                </div>
               )}
-              <Button onClick={nextStep}>
-                {currentStep === 2 ? "Get Quote" : "Next"}
-              </Button>
             </div>
-          )}
-        </div>
+          </>
+        )}
       </div>
     </div>
   );
