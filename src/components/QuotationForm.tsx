@@ -171,6 +171,12 @@ const QuotationForm = () => {
       await sendQuotationEmails(formData);
       toast.success("Your quote has been sent to your email!");
       
+      // Reset form after successful submission
+      setFormData(initialFormData);
+      setCurrentStep(0);
+      setSelectedServiceId(null);
+      setShowFinalOptions(false);
+      
     } catch (error) {
       console.error('Error:', error);
       toast.error("There was an error processing your request. Please try again.");
