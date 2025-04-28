@@ -1,12 +1,12 @@
-
 import React, { useState } from "react";
 import { serviceCategories } from "@/data/servicesData";
 import { CustomerFormData, ServiceSelection } from "@/types/form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
+import { X } from "lucide-react";
 
 const initialFormData: CustomerFormData = {
   name: "",
@@ -35,28 +35,19 @@ const QuotationForm = () => {
   };
 
   const handleSubServiceChange = (serviceId: string, subServiceId: string) => {
-    // Find if we already have this service category
     const existingService = formData.selectedServices.find(
       (s) => s.serviceId === serviceId && s.subServiceId === subServiceId
     );
     
     if (existingService) {
-      // If it exists, remove it (toggle behavior)
-      setFormData({
-        ...formData,
-        selectedServices: formData.selectedServices.filter(
-          (s) => !(s.serviceId === serviceId && s.subServiceId === subServiceId)
-        ),
-      });
+      removeService(serviceId, subServiceId);
     } else {
-      // Add the service
       const serviceCategory = serviceCategories.find((sc) => sc.id === serviceId);
       const subService = serviceCategory?.subServices.find((ss) => ss.id === subServiceId);
       
       if (serviceCategory && subService) {
         let newServices = [...formData.selectedServices];
         
-        // If it has units (like minutes for walkthroughs), set default quantity
         const quantity = subService.minimumUnits || undefined;
         
         newServices.push({
@@ -71,6 +62,15 @@ const QuotationForm = () => {
         });
       }
     }
+  };
+
+  const removeService = (serviceId: string, subServiceId: string) => {
+    setFormData({
+      ...formData,
+      selectedServices: formData.selectedServices.filter(
+        (s) => !(s.serviceId === serviceId && s.subServiceId === subServiceId)
+      ),
+    });
   };
 
   const handleQuantityChange = (serviceId: string, subServiceId: string, quantity: number) => {
@@ -119,7 +119,6 @@ const QuotationForm = () => {
 
   const nextStep = () => {
     if (currentStep === 0) {
-      // Validate personal info
       if (!formData.name.trim() || !formData.email.trim() || !formData.phone.trim()) {
         toast.error("Please fill in all required fields");
         return;
@@ -133,7 +132,6 @@ const QuotationForm = () => {
       
       setCurrentStep(1);
     } else if (currentStep === 1) {
-      // Validate service selection
       if (formData.selectedServices.length === 0) {
         toast.error("Please select at least one service");
         return;
@@ -141,7 +139,6 @@ const QuotationForm = () => {
       
       setCurrentStep(2);
     } else if (currentStep === 2) {
-      // Show final options screen
       setShowFinalOptions(true);
     }
   };
@@ -155,17 +152,12 @@ const QuotationForm = () => {
   const handleSubmit = async (paidOption: boolean) => {
     setSubmitting(true);
     
-    // Simulate sending email or processing payment
     try {
-      // In a real app, send this data to your backend
       console.log("Form submitted:", { ...formData, paidOption });
       
       if (paidOption) {
-        // Handle payment processing
         toast.success("Payment successful! Your quote has been sent to your email.");
-        // Reset form or redirect
       } else {
-        // Start countdown for free option
         let seconds = 10;
         setCountdown(seconds);
         
@@ -176,7 +168,6 @@ const QuotationForm = () => {
           if (seconds <= 0) {
             clearInterval(timer);
             toast.success("Your quote has been sent to your email!");
-            // Reset form or redirect
           }
         }, 1000);
       }
@@ -187,7 +178,6 @@ const QuotationForm = () => {
     }
   };
 
-  // Render steps based on current step
   const renderStep = () => {
     switch (currentStep) {
       case 0:
@@ -271,17 +261,16 @@ const QuotationForm = () => {
                     .find((c) => c.id === selectedServiceId)
                     ?.subServices.map((subService) => (
                       <div key={subService.id} className="flex flex-col space-y-2">
-                        <div className="flex items-center justify-between border rounded-md p-3 hover:bg-secondary/50 cursor-pointer"
-                             onClick={() => handleSubServiceChange(selectedServiceId, subService.id)}>
-                          <div>
-                            <span className="font-medium">{subService.name}</span>
-                            <div className="text-sm text-muted-foreground">
-                              ${subService.price}
-                              {subService.unit && ` ${subService.unit}`}
-                              {subService.minimumUnits && ` (min. ${subService.minimumUnits})`}
-                            </div>
-                          </div>
-                          <div className={`w-6 h-6 rounded-md flex items-center justify-center border ${isServiceSelected(selectedServiceId, subService.id) ? 'bg-primary text-white border-primary' : 'bg-background border-input'}`}>
+                        <div 
+                          className="flex items-center justify-between border rounded-md p-3 hover:bg-secondary/50 cursor-pointer"
+                          onClick={() => handleSubServiceChange(selectedServiceId, subService.id)}
+                        >
+                          <span className="font-medium">{subService.name}</span>
+                          <div className={`w-6 h-6 rounded-md flex items-center justify-center border ${
+                            isServiceSelected(selectedServiceId, subService.id) 
+                              ? 'bg-primary text-white border-primary' 
+                              : 'bg-background border-input'
+                          }`}>
                             {isServiceSelected(selectedServiceId, subService.id) && "✓"}
                           </div>
                         </div>
@@ -316,35 +305,34 @@ const QuotationForm = () => {
             )}
             
             {formData.selectedServices.length > 0 && (
-              <div className="p-4 border rounded-md mt-6 bg-secondary/30">
+              <div className="p-4 border rounded-md mt-6">
                 <h3 className="font-semibold mb-2">Selected Services:</h3>
-                <ul className="space-y-1 mb-4">
+                <ul className="space-y-2">
                   {formData.selectedServices.map((service) => {
                     const serviceCategory = serviceCategories.find((sc) => sc.id === service.serviceId);
                     const subService = serviceCategory?.subServices.find((ss) => ss.id === service.subServiceId);
                     
                     if (!serviceCategory || !subService) return null;
                     
-                    let price = subService.price;
-                    if (service.quantity && subService.unit) {
-                      price *= service.quantity;
-                    }
-                    
                     return (
-                      <li key={`${service.serviceId}-${service.subServiceId}`} className="flex justify-between">
+                      <li 
+                        key={`${service.serviceId}-${service.subServiceId}`} 
+                        className="flex justify-between items-center bg-secondary/20 p-2 rounded-md"
+                      >
                         <span>
                           {serviceCategory.name}: {subService.name}
                           {service.quantity && subService.unit && ` (${service.quantity} ${subService.unit.replace('per ', '')})`}
                         </span>
-                        <span className="font-medium">${price}</span>
+                        <button
+                          onClick={() => removeService(service.serviceId, service.subServiceId)}
+                          className="p-1 hover:bg-secondary rounded-full"
+                        >
+                          <X size={16} className="text-muted-foreground" />
+                        </button>
                       </li>
                     );
                   })}
                 </ul>
-                <div className="flex justify-between font-bold pt-2 border-t">
-                  <span>Total:</span>
-                  <span>${calculateTotal()}</span>
-                </div>
               </div>
             )}
           </div>
@@ -374,18 +362,13 @@ const QuotationForm = () => {
             </div>
             
             <div className="border rounded-md p-4 bg-secondary/30">
-              <h3 className="font-semibold mb-2">Services</h3>
-              <ul className="space-y-1 mb-4">
+              <h3 className="font-semibold mb-2">Selected Services</h3>
+              <ul className="space-y-2">
                 {formData.selectedServices.map((service) => {
                   const serviceCategory = serviceCategories.find((sc) => sc.id === service.serviceId);
                   const subService = serviceCategory?.subServices.find((ss) => ss.id === service.subServiceId);
                   
                   if (!serviceCategory || !subService) return null;
-                  
-                  let price = subService.price;
-                  if (service.quantity && subService.unit) {
-                    price *= service.quantity;
-                  }
                   
                   return (
                     <li key={`${service.serviceId}-${service.subServiceId}`} className="flex justify-between">
@@ -393,24 +376,11 @@ const QuotationForm = () => {
                         {serviceCategory.name}: {subService.name}
                         {service.quantity && subService.unit && ` (${service.quantity} ${subService.unit.replace('per ', '')})`}
                       </span>
-                      <span className="font-medium">${price}</span>
                     </li>
                   );
                 })}
               </ul>
-              <div className="flex justify-between font-bold border-t pt-2">
-                <span>Total:</span>
-                <span>${calculateTotal()}</span>
-              </div>
             </div>
-            
-            {!showFinalOptions && (
-              <div className="flex justify-center">
-                <Button onClick={() => setShowFinalOptions(true)} className="w-full">
-                  Get My Quote
-                </Button>
-              </div>
-            )}
           </div>
         );
         
