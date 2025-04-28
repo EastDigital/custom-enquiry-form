@@ -4,7 +4,7 @@ import QuotationForm from "@/components/QuotationForm";
 
 const Index = () => {
   return (
-    <div className="min-h-screen dark bg-gradient-to-b from-background to-muted/20 py-12">
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 py-12">
       <div className="container">
         <div className="max-w-5xl mx-auto mb-12">
           <h1 className="text-4xl font-bold text-center mb-3 bg-clip-text text-transparent bg-gradient-to-r from-brand-orange to-brand-orange/70">

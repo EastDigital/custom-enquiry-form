@@ -90,7 +90,7 @@
   }
 
   body {
-    @apply bg-background text-foreground dark:bg-background dark:text-foreground;
+    @apply bg-background text-foreground;
   }
 }
 
