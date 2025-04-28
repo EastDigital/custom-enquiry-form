@@ -1,9 +1,13 @@
 
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createClient } from '@supabase/supabase-js';
 import { CustomerFormData } from '@/types/form';
 import { generateCustomerEmailHTML, generateAdminEmailHTML } from './emailTemplates';
 
-const supabase = createClientComponentClient();
+// Create a Supabase client with public keys
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export const sendQuotationEmails = async (formData: CustomerFormData) => {
   try {
