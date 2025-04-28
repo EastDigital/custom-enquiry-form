@@ -32,7 +32,7 @@ export const sendQuotationEmails = async (formData: CustomerFormData) => {
       };
     }
     
-    // Real implementation with Supabase
+    // Real implementation with Supabase - sending emails immediately
     const { data, error } = await supabase.functions.invoke('send-quotation-emails', {
       body: {
         customerEmail: formData.email,

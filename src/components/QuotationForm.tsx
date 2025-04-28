@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { serviceCategories } from "@/data/servicesData";
 import { CustomerFormData, ServiceSelection } from "@/types/form";
@@ -495,7 +496,7 @@ const QuotationForm = () => {
         </AlertTitle>
         <AlertDescription className="text-center text-foreground">
           <p className="mb-4 text-lg">
-            You will receive email in about 10 minutes. Check your spam or junk folder if you did not receive it in your Inbox.
+            You will receive email shortly. Check your spam or junk folder if you did not receive it in your Inbox.
           </p>
           <p className="text-sm text-muted-foreground">
             Thank you for submitting your quote request. Our team is working on it!
