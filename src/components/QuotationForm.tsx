@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { X } from "lucide-react";
+import { sendQuotationEmails } from '@/utils/supabaseEmail';
 
 const initialFormData: CustomerFormData = {
   name: "",
@@ -153,25 +154,15 @@ const QuotationForm = () => {
     setSubmitting(true);
     
     try {
-      console.log("Form submitted:", { ...formData, paidOption });
-      
       if (paidOption) {
         toast.success("Payment successful! Your quote has been sent to your email.");
-      } else {
-        let seconds = 10;
-        setCountdown(seconds);
-        
-        const timer = setInterval(() => {
-          seconds -= 1;
-          setCountdown(seconds);
-          
-          if (seconds <= 0) {
-            clearInterval(timer);
-            toast.success("Your quote has been sent to your email!");
-          }
-        }, 1000);
       }
+      
+      await sendQuotationEmails(formData);
+      toast.success("Your quote has been sent to your email!");
+      
     } catch (error) {
+      console.error('Error:', error);
       toast.error("There was an error processing your request. Please try again.");
     } finally {
       setSubmitting(false);
