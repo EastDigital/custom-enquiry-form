@@ -54,11 +54,20 @@ export const generateCustomerEmailHTML = (
   email: string,
   phone: string,
   selectedServices: ServiceSelection[],
-  urgent: boolean = false
+  urgent: boolean = false,
+  documentUrl?: string,
+  documentName?: string
 ) => {
   const total = calculateTotal(selectedServices, urgent);
   const urgencyBadgeColor = urgent ? "#ff6900" : "#4ade80";
   const urgencyText = urgent ? "Urgent" : "Not So Urgent";
+  
+  const documentSection = documentUrl && documentName ? `
+    <div style="margin: 15px 0; padding: 10px; background-color: #f8fafc; border-radius: 8px;">
+      <p><strong>Attached Document:</strong> ${documentName}</p>
+      <p>You can access your document here: <a href="${documentUrl}" target="_blank">View Document</a></p>
+    </div>
+  ` : '';
   
   return `
     <!DOCTYPE html>
@@ -94,6 +103,8 @@ export const generateCustomerEmailHTML = (
             <div style="margin: 15px 0; padding: 10px; background-color: #f8fafc; border-radius: 8px;">
               <p><strong>Urgency Level:</strong> <span class="urgency-badge">${urgencyText}</span></p>
             </div>
+            
+            ${documentSection}
             
             <h3>Services Selected:</h3>
             <table>
@@ -135,11 +146,17 @@ export const generateAdminEmailHTML = (
   customerEmail: string,
   customerPhone: string,
   selectedServices: ServiceSelection[],
-  urgent: boolean = false
+  urgent: boolean = false,
+  documentUrl?: string,
+  documentName?: string
 ) => {
   const total = calculateTotal(selectedServices, urgent);
   const urgencyBadgeColor = urgent ? "#ff6900" : "#4ade80";
   const urgencyText = urgent ? "Urgent" : "Not So Urgent";
+  
+  const documentSection = documentUrl && documentName ? `
+    <p><strong>Document:</strong> <a href="${documentUrl}" target="_blank">${documentName}</a></p>
+  ` : '';
   
   return `
     <!DOCTYPE html>
@@ -175,6 +192,7 @@ export const generateAdminEmailHTML = (
               <p><strong>Email:</strong> ${customerEmail}</p>
               <p><strong>Phone:</strong> ${customerPhone}</p>
               <p><strong>Urgency Level:</strong> <span class="urgency-badge">${urgencyText}</span></p>
+              ${documentSection}
             </div>
             
             <h3>Selected Services:</h3>

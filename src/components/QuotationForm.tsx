@@ -22,6 +22,8 @@ const QuotationForm = () => {
     showConfirmation,
     handlePersonalInfoChange,
     handleUrgentChange,
+    handleHasDocumentChange,
+    handleDocumentUpload,
     handleServiceCategoryChange,
     handleSubServiceChange,
     removeService,
@@ -40,6 +42,8 @@ const QuotationForm = () => {
             formData={formData}
             handlePersonalInfoChange={handlePersonalInfoChange}
             handleUrgentChange={handleUrgentChange}
+            handleHasDocumentChange={handleHasDocumentChange}
+            handleDocumentUpload={handleDocumentUpload}
           />
         );
         

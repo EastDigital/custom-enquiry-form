@@ -40,19 +40,26 @@ export const sendQuotationEmails = async (formData: CustomerFormData) => {
         customerPhone: formData.phone,
         selectedServices: formData.selectedServices,
         urgent: formData.urgent,
+        hasDocument: formData.hasDocument,
+        documentUrl: formData.documentUrl,
+        documentName: formData.documentName,
         customerTemplate: generateCustomerEmailHTML(
           formData.name,
           formData.email,
           formData.phone,
           formData.selectedServices,
-          formData.urgent
+          formData.urgent,
+          formData.hasDocument ? formData.documentUrl : undefined,
+          formData.hasDocument ? formData.documentName : undefined
         ),
         adminTemplate: generateAdminEmailHTML(
           formData.name,
           formData.email,
           formData.phone,
           formData.selectedServices,
-          formData.urgent
+          formData.urgent,
+          formData.hasDocument ? formData.documentUrl : undefined,
+          formData.hasDocument ? formData.documentName : undefined
         )
       }
     });

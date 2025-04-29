@@ -11,6 +11,9 @@ const initialFormData: CustomerFormData = {
   phone: "",
   selectedServices: [],
   urgent: false,
+  hasDocument: false,
+  documentUrl: "",
+  documentName: "",
 };
 
 export const useQuotationForm = () => {
@@ -33,6 +36,23 @@ export const useQuotationForm = () => {
     setFormData({
       ...formData,
       urgent: checked,
+    });
+  };
+  
+  const handleHasDocumentChange = (checked: boolean) => {
+    setFormData({
+      ...formData,
+      hasDocument: checked,
+      // Reset document fields if toggling off
+      ...(checked === false && { documentUrl: "", documentName: "" }),
+    });
+  };
+
+  const handleDocumentUpload = (url: string, fileName: string) => {
+    setFormData({
+      ...formData,
+      documentUrl: url,
+      documentName: fileName,
     });
   };
 
@@ -117,6 +137,12 @@ export const useQuotationForm = () => {
         return;
       }
       
+      // If document upload is enabled but no document was uploaded
+      if (formData.hasDocument && !formData.documentUrl) {
+        toast.error("Please upload your document or turn off the document upload option");
+        return;
+      }
+      
       setCurrentStep(1);
     } else if (currentStep === 1) {
       if (formData.selectedServices.length === 0) {
@@ -175,6 +201,8 @@ export const useQuotationForm = () => {
     showConfirmation,
     handlePersonalInfoChange,
     handleUrgentChange,
+    handleHasDocumentChange,
+    handleDocumentUpload,
     handleServiceCategoryChange,
     handleSubServiceChange,
     removeService,
@@ -185,4 +213,3 @@ export const useQuotationForm = () => {
     handleSubmit,
   };
 };
-

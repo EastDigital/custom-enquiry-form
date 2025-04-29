@@ -11,4 +11,7 @@ export type CustomerFormData = {
   phone: string;
   selectedServices: ServiceSelection[];
   urgent: boolean;
+  hasDocument: boolean;
+  documentUrl?: string;
+  documentName?: string;
 };

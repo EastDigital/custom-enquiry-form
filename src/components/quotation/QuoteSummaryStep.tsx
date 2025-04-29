@@ -2,6 +2,7 @@
 import React from "react";
 import { CustomerFormData } from "@/types/form";
 import { serviceCategories } from "@/data/servicesData";
+import { FileText } from "lucide-react";
 
 interface QuoteSummaryStepProps {
   formData: CustomerFormData;
@@ -31,6 +32,16 @@ const QuoteSummaryStep: React.FC<QuoteSummaryStepProps> = ({ formData }) => {
             <span className="text-sm text-muted-foreground">Urgency:</span>
             <p>{formData.urgent ? "Urgent" : "Not So Urgent"}</p>
           </div>
+          
+          {formData.hasDocument && formData.documentUrl && (
+            <div className="col-span-2">
+              <span className="text-sm text-muted-foreground">Document:</span>
+              <p className="flex items-center gap-1">
+                <FileText className="h-4 w-4" />
+                {formData.documentName}
+              </p>
+            </div>
+          )}
         </div>
       </div>
       
