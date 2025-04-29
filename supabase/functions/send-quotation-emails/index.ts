@@ -38,13 +38,13 @@ const handler = async (req: Request): Promise<Response> => {
     }: EmailRequest = await req.json();
 
     // Define the admin email address
-    const adminEmail = "admin@yourbusiness.com"; // Replace with your actual admin email
+    const adminEmail = "info@eastdigital.in"; // Replace with your actual admin email
 
     console.log(`Sending email to customer: ${customerEmail}`);
     
     // Send email to the customer
     const customerEmailResponse = await resend.emails.send({
-      from: "Quotation System <onboarding@resend.dev>", // Update with your verified domain when ready
+      from: "Quotation System <info@eastdigital.in>", // Update with your verified domain when ready
       to: [customerEmail],
       subject: `Your Quote Request - ${customerName}`,
       html: customerTemplate,
@@ -55,7 +55,7 @@ const handler = async (req: Request): Promise<Response> => {
     // Send email to admin
     console.log(`Sending email to admin: ${adminEmail}`);
     const adminEmailResponse = await resend.emails.send({
-      from: "Quotation System <onboarding@resend.dev>", // Update with your verified domain when ready
+      from: "Quotation System <info@eastdigital.in>", // Update with your verified domain when ready
       to: [adminEmail],
       subject: `New Quote Request - ${customerName}`,
       html: adminTemplate,
