@@ -37,28 +37,32 @@ const handler = async (req: Request): Promise<Response> => {
       adminTemplate,
     }: EmailRequest = await req.json();
 
-    // Define the admin email address
-    const adminEmail = "info@eastdigital.in"; // Replace with your actual admin email
+    // For Resend free tier testing: use your registered email
+    const testingEmail = "eastdigitalcompany@gmail.com"; // Your Resend registered email
 
-    console.log(`Sending email to customer: ${customerEmail}`);
+    // Log original recipient information (for reference only)
+    console.log(`Original customer email: ${customerEmail}`);
     
-    // Send email to the customer
+    // Send email with customer template to your testing email
+    console.log(`Sending customer template email to testing address: ${testingEmail}`);
     const customerEmailResponse = await resend.emails.send({
-      from: "Quotation System <onboarding@resend.dev>", // Using Resend's default domain
-      to: [customerEmail],
-      subject: `Your Quote Request - ${customerName}`,
+      from: "Quotation System <onboarding@resend.dev>",
+      to: [testingEmail], // Send to your testing email
+      subject: `[TEST] Customer Quote Request - ${customerName}`,
       html: customerTemplate,
+      text: `This is a test email for customer ${customerName}. In production, this would be sent to ${customerEmail}.`
     });
 
     console.log("Customer email response:", customerEmailResponse);
 
-    // Send email to admin
-    console.log(`Sending email to admin: ${adminEmail}`);
+    // Send email with admin template to your testing email
+    console.log(`Sending admin template email to testing address: ${testingEmail}`);
     const adminEmailResponse = await resend.emails.send({
-      from: "Quotation System <onboarding@resend.dev>", // Using Resend's default domain
-      to: [adminEmail],
-      subject: `New Quote Request - ${customerName}`,
+      from: "Quotation System <onboarding@resend.dev>",
+      to: [testingEmail], // Send to your testing email
+      subject: `[TEST] Admin Quote Request - ${customerName}`,
       html: adminTemplate,
+      text: `This is a test email for an admin notification about customer ${customerName}.`
     });
 
     console.log("Admin email response:", adminEmailResponse);
@@ -68,7 +72,8 @@ const handler = async (req: Request): Promise<Response> => {
         success: true,
         customerEmail: customerEmailResponse,
         adminEmail: adminEmailResponse,
-        message: "Emails sent successfully",
+        message: "Test emails sent to your registered email address",
+        note: "This is using the Resend free tier which only allows sending to your registered email"
       }),
       {
         status: 200,
