@@ -9,6 +9,7 @@ export type CustomerFormData = {
   name: string;
   email: string;
   phone: string;
+  country: string;
   selectedServices: ServiceSelection[];
   urgent: boolean;
   hasDocument: boolean;
