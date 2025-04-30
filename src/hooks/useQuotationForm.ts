@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { CustomerFormData, ServiceSelection } from "@/types/form";
 import { serviceCategories } from "@/data/servicesData";
@@ -28,12 +27,22 @@ export const useQuotationForm = () => {
   const [message, setMessage] = useState("");
   const [inquiryMode, setInquiryMode] = useState(true);
   const [country, setCountry] = useState("");
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
   const handlePersonalInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: value,
     });
+    
+    // Clear error for the field when user types
+    if (formErrors[name]) {
+      setFormErrors({
+        ...formErrors,
+        [name]: "",
+      });
+    }
   };
 
   const handleCountryChange = (value: string) => {
@@ -42,6 +51,14 @@ export const useQuotationForm = () => {
       country: value,
     });
     setCountry(value);
+    
+    // Clear country error when user selects a country
+    if (formErrors.country) {
+      setFormErrors({
+        ...formErrors,
+        country: "",
+      });
+    }
   };
 
   const handleMessageChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -62,6 +79,14 @@ export const useQuotationForm = () => {
       // Reset document fields if toggling off
       ...(checked === false && { documentUrl: "", documentName: "" }),
     });
+    
+    // Clear document error if user disables document upload
+    if (!checked && formErrors.documentUrl) {
+      setFormErrors({
+        ...formErrors,
+        documentUrl: "",
+      });
+    }
   };
 
   const handleDocumentUpload = (url: string, fileName: string) => {
@@ -70,6 +95,14 @@ export const useQuotationForm = () => {
       documentUrl: url,
       documentName: fileName,
     });
+    
+    // Clear document error when user uploads a document
+    if (formErrors.documentUrl) {
+      setFormErrors({
+        ...formErrors,
+        documentUrl: "",
+      });
+    }
   };
 
   const handleServiceCategoryChange = (value: string) => {
@@ -142,24 +175,49 @@ export const useQuotationForm = () => {
 
   // Validate basic form data
   const validateBasicForm = () => {
-    if (!formData.name.trim() || !formData.email.trim() || !formData.phone.trim() || !formData.country) {
-      toast.error("Please fill in all required fields");
-      return false;
+    const errors: Record<string, string> = {};
+    let isValid = true;
+    
+    if (!formData.name.trim()) {
+      errors.name = "Name is required";
+      isValid = false;
     }
     
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-      toast.error("Please enter a valid email address");
-      return false;
+    if (!formData.email.trim()) {
+      errors.email = "Email is required";
+      isValid = false;
+    } else {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.email)) {
+        errors.email = "Please enter a valid email address";
+        isValid = false;
+      }
+    }
+    
+    if (!formData.phone.trim()) {
+      errors.phone = "Phone number is required";
+      isValid = false;
+    }
+    
+    if (!formData.country) {
+      errors.country = "Please select your country";
+      isValid = false;
     }
     
     // If document upload is enabled but no document was uploaded
     if (formData.hasDocument && !formData.documentUrl) {
-      toast.error("Please upload your document or turn off the document upload option");
-      return false;
+      errors.documentUrl = "Please upload your document or turn off the document upload option";
+      isValid = false;
     }
     
-    return true;
+    setFormErrors(errors);
+    
+    if (!isValid) {
+      // Still show a toast for general notification
+      toast.error("Please correct the highlighted fields");
+    }
+    
+    return isValid;
   };
 
   const nextStep = () => {
@@ -281,5 +339,6 @@ export const useQuotationForm = () => {
     setInquiryMode,
     country,
     handleCountryChange,
+    formErrors, // Export the form errors
   };
 };

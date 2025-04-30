@@ -40,6 +40,7 @@ const QuotationForm = () => {
     setInquiryMode,
     country,
     handleCountryChange,
+    formErrors,
   } = useQuotationForm();
 
   const renderStep = () => {
@@ -56,6 +57,7 @@ const QuotationForm = () => {
             handleMessageChange={handleMessageChange}
             country={country}
             handleCountryChange={handleCountryChange}
+            formErrors={formErrors}
           />
         );
         
@@ -80,11 +82,37 @@ const QuotationForm = () => {
     }
   };
 
+  // Create different confirmation messages based on form type
+  const getConfirmationMessage = () => {
+    if (inquiryMode) {
+      return {
+        title: "Inquiry Submitted",
+        message: "Thanks for reaching us, we will get in touch with you at the earliest possible.",
+      };
+    } else if (showFinalOptions) {
+      return {
+        title: "Quotation Requested",
+        message: "Thanks, the quotation will be sent to you in about 30 mins, check inbox or spam/junk.",
+      };
+    } else {
+      return {
+        title: "Quote Request Submitted", 
+        message: "Thanks, the quotation will be sent to you right away."
+      };
+    }
+  };
+
+  const confirmationDetails = getConfirmationMessage();
+
   return (
     <div className="max-w-2xl mx-auto p-4" id="quotation-form-container">
       <div className="mb-8">
         {showConfirmation ? (
-          <ConfirmationMessage show={showConfirmation} />
+          <ConfirmationMessage 
+            show={showConfirmation} 
+            title={confirmationDetails.title}
+            message={confirmationDetails.message}
+          />
         ) : (
           <>
             <Tabs 

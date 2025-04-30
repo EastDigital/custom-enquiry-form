@@ -21,6 +21,7 @@ interface PersonalInfoStepProps {
   handleMessageChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   country: string;
   handleCountryChange: (value: string) => void;
+  formErrors?: Record<string, string>;
 }
 
 const PersonalInfoStep: React.FC<PersonalInfoStepProps> = ({
@@ -33,6 +34,7 @@ const PersonalInfoStep: React.FC<PersonalInfoStepProps> = ({
   handleMessageChange,
   country,
   handleCountryChange,
+  formErrors = {},
 }) => {
   const [isUploading, setIsUploading] = useState(false);
 
@@ -107,12 +109,15 @@ const PersonalInfoStep: React.FC<PersonalInfoStepProps> = ({
           <Input
             id="name"
             name="name"
-            className="form-input mt-1 border-gray-300 bg-white"
+            className={`form-input mt-1 border-gray-300 ${formErrors.name ? 'border-red-500' : ''}`}
             placeholder="John Doe"
             value={formData.name}
             onChange={handlePersonalInfoChange}
             required
           />
+          {formErrors.name && (
+            <p className="text-red-500 text-xs mt-1">{formErrors.name}</p>
+          )}
         </div>
         
         <div>
@@ -121,12 +126,15 @@ const PersonalInfoStep: React.FC<PersonalInfoStepProps> = ({
             id="email"
             name="email"
             type="email"
-            className="form-input mt-1 border-gray-300 bg-white"
+            className={`form-input mt-1 border-gray-300 ${formErrors.email ? 'border-red-500' : ''}`}
             placeholder="john@example.com"
             value={formData.email}
             onChange={handlePersonalInfoChange}
             required
           />
+          {formErrors.email && (
+            <p className="text-red-500 text-xs mt-1">{formErrors.email}</p>
+          )}
         </div>
         
         <div>
@@ -135,18 +143,24 @@ const PersonalInfoStep: React.FC<PersonalInfoStepProps> = ({
             id="phone"
             name="phone"
             type="tel"
-            className="form-input mt-1 border-gray-300 bg-white"
+            className={`form-input mt-1 border-gray-300 ${formErrors.phone ? 'border-red-500' : ''}`}
             placeholder="+1 (555) 123-4567"
             value={formData.phone}
             onChange={handlePersonalInfoChange}
             required
           />
+          {formErrors.phone && (
+            <p className="text-red-500 text-xs mt-1">{formErrors.phone}</p>
+          )}
         </div>
         
         <div>
           <Label htmlFor="country" className="form-label">Country*</Label>
-          <Select onValueChange={handleCountryChange} value={country || undefined}>
-            <SelectTrigger className="form-dropdown mt-1 border-gray-300 bg-white">
+          <Select 
+            onValueChange={handleCountryChange} 
+            value={country || undefined}
+          >
+            <SelectTrigger className={`form-dropdown mt-1 border-gray-300 ${formErrors.country ? 'border-red-500' : ''}`}>
               <SelectValue placeholder="Select your country" />
             </SelectTrigger>
             <SelectContent>
@@ -159,6 +173,9 @@ const PersonalInfoStep: React.FC<PersonalInfoStepProps> = ({
               </SelectGroup>
             </SelectContent>
           </Select>
+          {formErrors.country && (
+            <p className="text-red-500 text-xs mt-1">{formErrors.country}</p>
+          )}
         </div>
 
         <div className="flex items-center justify-between mt-4 pt-2 border-t">
@@ -229,12 +246,15 @@ const PersonalInfoStep: React.FC<PersonalInfoStepProps> = ({
                     variant="outline"
                     onClick={() => document.getElementById("document-upload")?.click()}
                     disabled={isUploading}
-                    className="w-full justify-center"
+                    className={`w-full justify-center ${formErrors.documentUrl ? 'border-red-500' : ''}`}
                   >
                     <Upload className="mr-2 h-4 w-4" />
                     {isUploading ? "Uploading..." : "Select File"}
                   </Button>
                 </div>
+              )}
+              {formErrors.documentUrl && (
+                <p className="text-red-500 text-xs mt-1">{formErrors.documentUrl}</p>
               )}
             </div>
           </div>
@@ -244,7 +264,7 @@ const PersonalInfoStep: React.FC<PersonalInfoStepProps> = ({
           <Label htmlFor="message" className="form-label">Message (Optional)</Label>
           <Textarea
             id="message"
-            className="mt-1 min-h-[100px] border-gray-300 bg-white"
+            className="mt-1 min-h-[100px] border-gray-300"
             placeholder="Please provide any additional details about your project..."
             value={message}
             onChange={handleMessageChange}
