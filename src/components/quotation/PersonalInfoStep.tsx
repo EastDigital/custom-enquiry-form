@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { FileText, Upload } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface PersonalInfoStepProps {
   formData: CustomerFormData;
@@ -15,6 +17,10 @@ interface PersonalInfoStepProps {
   handleUrgentChange: (checked: boolean) => void;
   handleDocumentUpload: (url: string, fileName: string) => void;
   handleHasDocumentChange: (checked: boolean) => void;
+  message: string;
+  handleMessageChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  country: string;
+  handleCountryChange: (value: string) => void;
 }
 
 const PersonalInfoStep: React.FC<PersonalInfoStepProps> = ({
@@ -23,6 +29,10 @@ const PersonalInfoStep: React.FC<PersonalInfoStepProps> = ({
   handleUrgentChange,
   handleDocumentUpload,
   handleHasDocumentChange,
+  message,
+  handleMessageChange,
+  country,
+  handleCountryChange,
 }) => {
   const [isUploading, setIsUploading] = useState(false);
 
@@ -79,6 +89,14 @@ const PersonalInfoStep: React.FC<PersonalInfoStepProps> = ({
     }
   };
 
+  // List of countries
+  const countries = [
+    "United States", "India", "United Kingdom", "Canada", "Australia", 
+    "Germany", "France", "Japan", "China", "Brazil", "Italy", "Spain", 
+    "Russia", "South Korea", "Mexico", "Indonesia", "Netherlands", 
+    "Turkey", "Saudi Arabia", "Switzerland", "United Arab Emirates", "Other"
+  ];
+
   return (
     <div className="space-y-4">
       <h2 className="text-2xl font-semibold text-center">Personal Information</h2>
@@ -89,7 +107,7 @@ const PersonalInfoStep: React.FC<PersonalInfoStepProps> = ({
           <Input
             id="name"
             name="name"
-            className="form-input mt-1"
+            className="form-input mt-1 border-gray-300 bg-white"
             placeholder="John Doe"
             value={formData.name}
             onChange={handlePersonalInfoChange}
@@ -103,7 +121,7 @@ const PersonalInfoStep: React.FC<PersonalInfoStepProps> = ({
             id="email"
             name="email"
             type="email"
-            className="form-input mt-1"
+            className="form-input mt-1 border-gray-300 bg-white"
             placeholder="john@example.com"
             value={formData.email}
             onChange={handlePersonalInfoChange}
@@ -117,12 +135,30 @@ const PersonalInfoStep: React.FC<PersonalInfoStepProps> = ({
             id="phone"
             name="phone"
             type="tel"
-            className="form-input mt-1"
+            className="form-input mt-1 border-gray-300 bg-white"
             placeholder="+1 (555) 123-4567"
             value={formData.phone}
             onChange={handlePersonalInfoChange}
             required
           />
+        </div>
+        
+        <div>
+          <Label htmlFor="country" className="form-label">Country*</Label>
+          <Select onValueChange={handleCountryChange} value={country || undefined}>
+            <SelectTrigger className="form-dropdown mt-1 border-gray-300 bg-white">
+              <SelectValue placeholder="Select your country" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                {countries.map((countryName) => (
+                  <SelectItem key={countryName} value={countryName}>
+                    {countryName}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="flex items-center justify-between mt-4 pt-2 border-t">
@@ -136,6 +172,7 @@ const PersonalInfoStep: React.FC<PersonalInfoStepProps> = ({
             id="urgent-mode"
             checked={formData.urgent}
             onCheckedChange={handleUrgentChange}
+            className="border border-gray-300"
           />
         </div>
 
@@ -150,6 +187,7 @@ const PersonalInfoStep: React.FC<PersonalInfoStepProps> = ({
             id="has-document"
             checked={formData.hasDocument}
             onCheckedChange={handleHasDocumentChange}
+            className="border border-gray-300"
           />
         </div>
 
@@ -201,6 +239,17 @@ const PersonalInfoStep: React.FC<PersonalInfoStepProps> = ({
             </div>
           </div>
         )}
+        
+        <div className="mt-4 pt-2 border-t">
+          <Label htmlFor="message" className="form-label">Message (Optional)</Label>
+          <Textarea
+            id="message"
+            className="mt-1 min-h-[100px] border-gray-300 bg-white"
+            placeholder="Please provide any additional details about your project..."
+            value={message}
+            onChange={handleMessageChange}
+          />
+        </div>
       </div>
     </div>
   );

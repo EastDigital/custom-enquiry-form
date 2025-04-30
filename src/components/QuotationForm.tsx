@@ -10,6 +10,7 @@ import QuoteSummaryStep from "./quotation/QuoteSummaryStep";
 import QuoteOptions from "./quotation/QuoteOptions";
 import ConfirmationMessage from "./quotation/ConfirmationMessage";
 import StepIndicator from "./quotation/StepIndicator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const QuotationForm = () => {
   const {
@@ -32,6 +33,13 @@ const QuotationForm = () => {
     nextStep,
     prevStep,
     handleSubmit,
+    handleInquirySubmit,
+    message,
+    handleMessageChange,
+    inquiryMode,
+    setInquiryMode,
+    country,
+    handleCountryChange,
   } = useQuotationForm();
 
   const renderStep = () => {
@@ -44,6 +52,10 @@ const QuotationForm = () => {
             handleUrgentChange={handleUrgentChange}
             handleHasDocumentChange={handleHasDocumentChange}
             handleDocumentUpload={handleDocumentUpload}
+            message={message}
+            handleMessageChange={handleMessageChange}
+            country={country}
+            handleCountryChange={handleCountryChange}
           />
         );
         
@@ -75,7 +87,18 @@ const QuotationForm = () => {
           <ConfirmationMessage show={showConfirmation} />
         ) : (
           <>
-            {!showFinalOptions && (
+            <Tabs 
+              defaultValue={inquiryMode ? "inquiry" : "quote"} 
+              className="mb-6"
+              onValueChange={(value) => setInquiryMode(value === "inquiry")}
+            >
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="inquiry">Quick Inquiry</TabsTrigger>
+                <TabsTrigger value="quote">Get Detailed Quote</TabsTrigger>
+              </TabsList>
+            </Tabs>
+
+            {!showFinalOptions && !inquiryMode && (
               <StepIndicator currentStep={currentStep} totalSteps={3} />
             )}
 
@@ -91,16 +114,26 @@ const QuotationForm = () => {
                   {renderStep()}
                   
                   <div className="mt-6 flex justify-between">
-                    {currentStep > 0 ? (
+                    {!inquiryMode && currentStep > 0 ? (
                       <Button variant="outline" onClick={prevStep}>
                         Back
                       </Button>
                     ) : (
                       <div></div>
                     )}
-                    <Button onClick={nextStep}>
-                      {currentStep === 2 ? "Get Quote" : "Next"}
-                    </Button>
+                    
+                    {inquiryMode ? (
+                      <Button 
+                        onClick={handleInquirySubmit}
+                        disabled={submitting}
+                      >
+                        {submitting ? "Submitting..." : "Submit Inquiry"}
+                      </Button>
+                    ) : (
+                      <Button onClick={nextStep}>
+                        {currentStep === 2 ? "Get Quote" : "Next"}
+                      </Button>
+                    )}
                   </div>
                 </>
               )}
