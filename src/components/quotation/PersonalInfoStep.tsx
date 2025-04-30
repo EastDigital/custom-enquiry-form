@@ -1,15 +1,15 @@
-
 import React, { useState } from "react";
 import { CustomerFormData } from "@/types/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { FileText, Upload } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import ToggleSwitch from "./ToggleSwitch";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface PersonalInfoStepProps {
   formData: CustomerFormData;
@@ -37,6 +37,7 @@ const PersonalInfoStep: React.FC<PersonalInfoStepProps> = ({
   formErrors = {},
 }) => {
   const [isUploading, setIsUploading] = useState(false);
+  const isMobile = useIsMobile();
 
   const allowedFileTypes = [
     "application/pdf", 
@@ -178,33 +179,27 @@ const PersonalInfoStep: React.FC<PersonalInfoStepProps> = ({
           )}
         </div>
 
-        <div className="flex items-center justify-between mt-4 pt-2 border-t">
-          <div className="space-y-0.5">
-            <Label htmlFor="urgent-mode" className="form-label">Urgency Level</Label>
-            <p className="text-sm text-muted-foreground">
-              {formData.urgent ? "Urgent" : "Not So Urgent"}
-            </p>
-          </div>
-          <Switch
+        <div className={`flex ${isMobile ? 'flex-col' : 'items-center justify-between'} mt-4 pt-2 border-t`}>
+          <Label htmlFor="urgent-mode" className="form-label mb-2">Urgency Level</Label>
+          <ToggleSwitch
             id="urgent-mode"
             checked={formData.urgent}
             onCheckedChange={handleUrgentChange}
-            className="border border-gray-300"
+            leftLabel="Not Urgent"
+            rightLabel="Urgent"
+            rightColor="text-orange-500"
           />
         </div>
 
-        <div className="flex items-center justify-between mt-4 pt-2 border-t">
-          <div className="space-y-0.5">
-            <Label htmlFor="has-document" className="form-label">Do you have a document to upload?</Label>
-            <p className="text-sm text-muted-foreground">
-              {formData.hasDocument ? "Yes" : "No"}
-            </p>
-          </div>
-          <Switch
+        <div className={`flex ${isMobile ? 'flex-col' : 'items-center justify-between'} mt-4 pt-2 border-t`}>
+          <Label htmlFor="has-document" className="form-label mb-2">Document Upload</Label>
+          <ToggleSwitch
             id="has-document"
             checked={formData.hasDocument}
             onCheckedChange={handleHasDocumentChange}
-            className="border border-gray-300"
+            leftLabel="No Document"
+            rightLabel="Has Document"
+            rightColor="text-blue-500"
           />
         </div>
 
