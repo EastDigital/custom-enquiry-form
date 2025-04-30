@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { useQuotationForm } from "@/hooks/useQuotationForm";
@@ -10,7 +11,7 @@ import QuoteSummaryStep from "./quotation/QuoteSummaryStep";
 import QuoteOptions from "./quotation/QuoteOptions";
 import ConfirmationMessage from "./quotation/ConfirmationMessage";
 import StepIndicator from "./quotation/StepIndicator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import ToggleSwitch from "./quotation/ToggleSwitch";
 
 const QuotationForm = () => {
   const isMobile = useIsMobile();
@@ -77,15 +78,21 @@ const QuotationForm = () => {
     }
   };
   const confirmationDetails = getConfirmationMessage();
+  
   return <div className="max-w-2xl mx-auto p-4" id="quotation-form-container">
       <div className="mb-8">
         {showConfirmation ? <ConfirmationMessage show={showConfirmation} title={confirmationDetails.title} message={confirmationDetails.message} /> : <>
-            <Tabs defaultValue={inquiryMode ? "inquiry" : "quote"} className="mb-6" onValueChange={value => setInquiryMode(value === "inquiry")}>
-              <TabsList className={`grid w-full grid-cols-2 ${isMobile ? 'h-auto py-1 gap-1' : 'px-0 mx-0 my-0 py-0'}`}>
-                <TabsTrigger value="inquiry" className={`text-sm ${isMobile ? 'py-1.5 px-2 h-auto' : ''}`}>Quick Inquiry</TabsTrigger>
-                <TabsTrigger value="quote" className={`text-sm font-normal ${isMobile ? 'py-1.5 px-2 h-auto' : ''}`}>Get Detailed Quote</TabsTrigger>
-              </TabsList>
-            </Tabs>
+            <div className="mb-6 flex justify-center">
+              <ToggleSwitch 
+                id="inquiry-mode-toggle"
+                checked={!inquiryMode}
+                onCheckedChange={(checked) => setInquiryMode(!checked)}
+                leftLabel="Quick Inquiry"
+                rightLabel="Get Detailed Quote"
+                leftColor="text-white"
+                rightColor="text-white"
+              />
+            </div>
 
             {!showFinalOptions && !inquiryMode && <StepIndicator currentStep={currentStep} totalSteps={3} />}
 

@@ -22,12 +22,20 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
   leftColor = "text-muted-foreground",
   rightColor = "text-primary"
 }) => {
+  // Check if this is the primary inquiry mode toggle based on the id
+  const isPrimaryToggle = id === "inquiry-mode-toggle";
+  
   return (
-    <div className="flex items-center gap-3">
+    <div className={cn(
+      "flex items-center gap-3",
+      isPrimaryToggle && "bg-slate-800 p-2 px-3 rounded-full shadow-lg border border-slate-700"
+    )}>
       <span 
         className={cn(
           "text-sm transition-colors cursor-pointer", 
-          !checked ? leftColor : "text-muted-foreground"
+          !checked ? leftColor : "text-muted-foreground",
+          isPrimaryToggle && !checked && "font-semibold",
+          isPrimaryToggle && "px-2"
         )}
         onClick={() => onCheckedChange(false)}
       >
@@ -41,19 +49,29 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
         aria-checked={checked}
         data-state={checked ? "checked" : "unchecked"}
         onClick={() => onCheckedChange(!checked)}
-        className="inline-flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors"
+        className={cn(
+          "inline-flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors"
+        )}
       >
         {checked ? (
-          <ToggleRight className="h-7 w-7 text-primary" />
+          <ToggleRight className={cn(
+            "h-7 w-7",
+            isPrimaryToggle ? "text-purple-400" : "text-primary"
+          )} />
         ) : (
-          <ToggleLeft className="h-7 w-7 text-muted-foreground" />
+          <ToggleLeft className={cn(
+            "h-7 w-7",
+            isPrimaryToggle ? "text-purple-400" : "text-muted-foreground"
+          )} />
         )}
       </button>
       
       <span 
         className={cn(
           "text-sm transition-colors cursor-pointer", 
-          checked ? rightColor : "text-muted-foreground"
+          checked ? rightColor : "text-muted-foreground",
+          isPrimaryToggle && checked && "font-semibold",
+          isPrimaryToggle && "px-2"
         )}
         onClick={() => onCheckedChange(true)}
       >
