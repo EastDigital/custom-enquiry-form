@@ -2,6 +2,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { useQuotationForm } from "@/hooks/useQuotationForm";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 // Import refactored components
 import PersonalInfoStep from "./quotation/PersonalInfoStep";
@@ -13,6 +14,8 @@ import StepIndicator from "./quotation/StepIndicator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const QuotationForm = () => {
+  const isMobile = useIsMobile();
+  
   const {
     formData,
     currentStep,
@@ -154,11 +157,12 @@ const QuotationForm = () => {
                       <Button 
                         onClick={handleInquirySubmit}
                         disabled={submitting}
+                        className={isMobile ? "w-full" : ""}
                       >
                         {submitting ? "Submitting..." : "Submit Inquiry"}
                       </Button>
                     ) : (
-                      <Button onClick={nextStep}>
+                      <Button onClick={nextStep} className={isMobile ? "w-full" : ""}>
                         {currentStep === 2 ? "Get Quote" : "Next"}
                       </Button>
                     )}
