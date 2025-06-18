@@ -105,3 +105,12 @@ export default {
 	},
 	plugins: [require("tailwindcss-animate")],
 } satisfies Config;
+
+theme: {
+  extend: {
+    colors: {
+      'brand-orange': '#f97316', // replace with your exact orange
+    }
+  }
+}
+
