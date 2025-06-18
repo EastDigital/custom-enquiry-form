@@ -108,7 +108,7 @@ const QuotationForm = () => {
               </div>}
 
             {/* Main Form Card */}
-            <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-0 shadow-2xl">
+            <Card className="relative bg-white/10 dark:bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-xl glass-card overflow-hidden">
               <CardContent className="p-8">
                 {showFinalOptions ? <QuoteOptions submitting={submitting} countdown={countdown} handleSubmit={handleSubmit} instantProposal={instantProposal} /> : <>
                     {renderStep()}
