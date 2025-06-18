@@ -1,6 +1,5 @@
 
 import React from "react";
-import { ToggleLeft, ToggleRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface ToggleSwitchProps {
@@ -19,64 +18,56 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
   onCheckedChange,
   leftLabel,
   rightLabel,
-  leftColor = "text-muted-foreground",
-  rightColor = "text-primary"
+  leftColor = "text-slate-600",
+  rightColor = "text-blue-600"
 }) => {
-  // Check if this is the primary inquiry mode toggle based on the id
   const isPrimaryToggle = id === "inquiry-mode-toggle";
   
   return (
     <div className={cn(
-      "flex items-center gap-3",
-      isPrimaryToggle && "bg-slate-800 p-2 px-3 rounded-full shadow-lg border border-slate-700"
+      "flex items-center",
+      isPrimaryToggle ? "bg-white dark:bg-slate-800 p-1 rounded-2xl shadow-sm" : "gap-4"
     )}>
-      <span 
-        className={cn(
-          "text-sm transition-colors cursor-pointer", 
-          !checked ? leftColor : "text-muted-foreground",
-          isPrimaryToggle && !checked && "font-semibold",
-          isPrimaryToggle && "px-2"
-        )}
+      <button
+        type="button"
         onClick={() => onCheckedChange(false)}
+        className={cn(
+          "px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200",
+          !checked 
+            ? isPrimaryToggle 
+              ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md" 
+              : `${leftColor} bg-slate-100 dark:bg-slate-700`
+            : "text-slate-400 hover:text-slate-600"
+        )}
       >
         {leftLabel}
-      </span>
+      </button>
+      
+      {!isPrimaryToggle && (
+        <div className="relative">
+          <div className="w-12 h-6 bg-slate-200 dark:bg-slate-700 rounded-full transition-colors">
+            <div className={cn(
+              "absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md transition-transform duration-200",
+              checked ? "translate-x-6" : "translate-x-0"
+            )} />
+          </div>
+        </div>
+      )}
       
       <button
         type="button"
-        id={id}
-        role="switch"
-        aria-checked={checked}
-        data-state={checked ? "checked" : "unchecked"}
-        onClick={() => onCheckedChange(!checked)}
-        className={cn(
-          "inline-flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors"
-        )}
-      >
-        {checked ? (
-          <ToggleRight className={cn(
-            "h-7 w-7",
-            isPrimaryToggle ? "text-purple-400" : "text-primary"
-          )} />
-        ) : (
-          <ToggleLeft className={cn(
-            "h-7 w-7",
-            isPrimaryToggle ? "text-purple-400" : "text-muted-foreground"
-          )} />
-        )}
-      </button>
-      
-      <span 
-        className={cn(
-          "text-sm transition-colors cursor-pointer", 
-          checked ? rightColor : "text-muted-foreground",
-          isPrimaryToggle && checked && "font-semibold",
-          isPrimaryToggle && "px-2"
-        )}
         onClick={() => onCheckedChange(true)}
+        className={cn(
+          "px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200",
+          checked 
+            ? isPrimaryToggle 
+              ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md" 
+              : `${rightColor} bg-slate-100 dark:bg-slate-700`
+            : "text-slate-400 hover:text-slate-600"
+        )}
       >
         {rightLabel}
-      </span>
+      </button>
     </div>
   );
 };

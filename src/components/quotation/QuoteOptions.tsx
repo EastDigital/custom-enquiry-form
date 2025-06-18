@@ -1,5 +1,8 @@
 
 import React from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Clock, Zap, CheckCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface QuoteOptionsProps {
   submitting: boolean;
@@ -10,62 +13,125 @@ interface QuoteOptionsProps {
 const QuoteOptions: React.FC<QuoteOptionsProps> = ({ submitting, countdown, handleSubmit }) => {
   if (submitting) {
     return (
-      <div className="text-center p-8">
-        <div className="animate-pulse-light mb-4">
-          <h3 className="text-xl font-semibold mb-2">Processing your quote...</h3>
-          
-          {countdown > 0 && (
-            <div className="mt-4">
-              <p>Your quote will be delivered in:</p>
-              <p className="text-3xl font-bold text-primary">{countdown} seconds</p>
-            </div>
-          )}
+      <div className="text-center p-12">
+        <div className="mb-6">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full mb-4">
+            <div className="w-8 h-8 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
+          </div>
         </div>
+        
+        <h3 className="text-2xl font-bold text-slate-800 dark:text-white mb-2">
+          Preparing Your Quote
+        </h3>
+        <p className="text-slate-600 dark:text-slate-300 mb-6">
+          Our system is analyzing your requirements...
+        </p>
+        
+        {countdown > 0 && (
+          <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 p-6 rounded-2xl border border-blue-200 dark:border-blue-800">
+            <p className="text-slate-700 dark:text-slate-300 mb-2">Estimated delivery time:</p>
+            <p className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              {countdown} seconds
+            </p>
+          </div>
+        )}
       </div>
     );
   }
   
   return (
-    <div className="p-6 border rounded-md">
-      <h3 className="text-xl font-semibold mb-4 text-center">Choose an Option</h3>
+    <div className="space-y-6">
+      <div className="text-center mb-8">
+        <h3 className="text-2xl font-bold text-slate-800 dark:text-white mb-2">
+          Choose Your Quote Option
+        </h3>
+        <p className="text-slate-600 dark:text-slate-300">
+          Select how you'd like to receive your detailed quotation
+        </p>
+      </div>
       
-      <div className="grid md:grid-cols-2 gap-4">
-        <div 
-          className="p-4 border rounded-md hover:shadow-md transition-shadow cursor-pointer bg-secondary/30"
+      <div className="grid md:grid-cols-2 gap-6">
+        {/* Free Option */}
+        <Card 
+          className="relative border-2 border-slate-200 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-600 transition-all duration-200 cursor-pointer group hover:shadow-lg"
           onClick={() => handleSubmit(false)}
         >
-          <div className="text-center mb-3">
-            <span className="inline-block p-2 rounded-full bg-secondary">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10" />
-                <polyline points="12 6 12 12 16 14" />
-              </svg>
-            </span>
-          </div>
-          <h4 className="font-semibold text-center">Free Quote</h4>
-          <p className="text-center text-sm text-muted-foreground">
-            Wait 10 minutes to receive your quote via email
-          </p>
-        </div>
+          <CardContent className="p-6">
+            <div className="text-center mb-4">
+              <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-r from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-600 rounded-full mb-3">
+                <Clock className="w-6 h-6 text-slate-600 dark:text-slate-300" />
+              </div>
+              <h4 className="text-xl font-bold text-slate-800 dark:text-white">Standard Quote</h4>
+              <p className="text-3xl font-bold text-slate-600 dark:text-slate-400 mt-2">Free</p>
+            </div>
+            
+            <div className="space-y-3 mb-6">
+              <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
+                <CheckCircle className="w-4 h-4 text-green-500" />
+                Detailed project quotation
+              </div>
+              <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
+                <CheckCircle className="w-4 h-4 text-green-500" />
+                Delivered via email
+              </div>
+              <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
+                <Clock className="w-4 h-4 text-blue-500" />
+                10-15 minutes delivery time
+              </div>
+            </div>
+            
+            <Button className="w-full bg-slate-600 hover:bg-slate-700 text-white rounded-xl h-12 font-semibold group-hover:bg-slate-700 transition-colors">
+              Get Free Quote
+            </Button>
+          </CardContent>
+        </Card>
         
-        <div 
-          className="p-4 border rounded-md hover:shadow-md transition-shadow cursor-pointer bg-primary/10"
+        {/* Premium Option */}
+        <Card 
+          className="relative border-2 border-blue-200 dark:border-blue-700 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 hover:shadow-xl transition-all duration-200 cursor-pointer group"
           onClick={() => handleSubmit(true)}
         >
-          <div className="text-center mb-3">
-            <span className="inline-block p-2 rounded-full bg-primary/20">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10" />
-                <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8" />
-                <path d="M12 18V6" />
-              </svg>
-            </span>
+          <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+            <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-1 rounded-full text-xs font-semibold">
+              POPULAR
+            </div>
           </div>
-          <h4 className="font-semibold text-center">Instant Quote - $10</h4>
-          <p className="text-center text-sm text-muted-foreground">
-            Get your detailed quote delivered instantly
-          </p>
-        </div>
+          
+          <CardContent className="p-6">
+            <div className="text-center mb-4">
+              <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full mb-3">
+                <Zap className="w-6 h-6 text-white" />
+              </div>
+              <h4 className="text-xl font-bold text-slate-800 dark:text-white">Instant Quote</h4>
+              <p className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mt-2">
+                $10
+              </p>
+            </div>
+            
+            <div className="space-y-3 mb-6">
+              <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
+                <CheckCircle className="w-4 h-4 text-green-500" />
+                Comprehensive project analysis
+              </div>
+              <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
+                <CheckCircle className="w-4 h-4 text-green-500" />
+                Priority email delivery
+              </div>
+              <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
+                <Zap className="w-4 h-4 text-purple-500" />
+                Instant delivery (30 seconds)
+              </div>
+              <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
+                <CheckCircle className="w-4 h-4 text-green-500" />
+                Bonus consultation call
+              </div>
+            </div>
+            
+            <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl h-12 font-semibold shadow-lg group-hover:shadow-xl transition-all">
+              Get Instant Quote - $10
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
