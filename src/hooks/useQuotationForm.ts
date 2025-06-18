@@ -1,33 +1,36 @@
-import { useState } from "react";
-import { CustomerFormData, ServiceSelection } from "@/types/form";
+
+import { useFormState } from "./useFormState";
+import { validatePersonalInfo } from "@/utils/formValidation";
 import { serviceCategories } from "@/data/servicesData";
 import { toast } from "sonner";
 import { sendQuotationEmails } from '@/utils/supabaseEmail';
 
-const initialFormData: CustomerFormData = {
-  name: "",
-  email: "",
-  phone: "",
-  country: "",
-  selectedServices: [],
-  urgent: false,
-  hasDocument: false,
-  documentUrl: "",
-  documentName: "",
-};
-
 export const useQuotationForm = () => {
-  const [formData, setFormData] = useState<CustomerFormData>(initialFormData);
-  const [currentStep, setCurrentStep] = useState(0);
-  const [selectedServiceId, setSelectedServiceId] = useState<string | null>(null);
-  const [showFinalOptions, setShowFinalOptions] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [countdown, setCountdown] = useState(10);
-  const [showConfirmation, setShowConfirmation] = useState(false);
-  const [message, setMessage] = useState("");
-  const [inquiryMode, setInquiryMode] = useState(true);
-  const [country, setCountry] = useState("");
-  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const {
+    formData,
+    setFormData,
+    currentStep,
+    setCurrentStep,
+    selectedServiceId,
+    setSelectedServiceId,
+    showFinalOptions,
+    setShowFinalOptions,
+    submitting,
+    setSubmitting,
+    countdown,
+    setCountdown,
+    showConfirmation,
+    setShowConfirmation,
+    message,
+    setMessage,
+    inquiryMode,
+    setInquiryMode,
+    country,
+    setCountry,
+    formErrors,
+    setFormErrors,
+    resetForm,
+  } = useFormState();
 
   const handlePersonalInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -36,7 +39,6 @@ export const useQuotationForm = () => {
       [name]: value,
     });
     
-    // Clear error for the field when user types
     if (formErrors[name]) {
       setFormErrors({
         ...formErrors,
@@ -52,7 +54,6 @@ export const useQuotationForm = () => {
     });
     setCountry(value);
     
-    // Clear country error when user selects a country
     if (formErrors.country) {
       setFormErrors({
         ...formErrors,
@@ -76,11 +77,9 @@ export const useQuotationForm = () => {
     setFormData({
       ...formData,
       hasDocument: checked,
-      // Reset document fields if toggling off
       ...(checked === false && { documentUrl: "", documentName: "" }),
     });
     
-    // Clear document error if user disables document upload
     if (!checked && formErrors.documentUrl) {
       setFormErrors({
         ...formErrors,
@@ -96,7 +95,6 @@ export const useQuotationForm = () => {
       documentName: fileName,
     });
     
-    // Clear document error when user uploads a document
     if (formErrors.documentUrl) {
       setFormErrors({
         ...formErrors,
@@ -122,7 +120,6 @@ export const useQuotationForm = () => {
       
       if (serviceCategory && subService) {
         let newServices = [...formData.selectedServices];
-        
         const quantity = subService.minimumUnits || undefined;
         
         newServices.push({
@@ -173,47 +170,11 @@ export const useQuotationForm = () => {
     );
   };
 
-  // Validate basic form data
-  const validateBasicForm = () => {
-    const errors: Record<string, string> = {};
-    let isValid = true;
-    
-    if (!formData.name.trim()) {
-      errors.name = "Name is required";
-      isValid = false;
-    }
-    
-    if (!formData.email.trim()) {
-      errors.email = "Email is required";
-      isValid = false;
-    } else {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(formData.email)) {
-        errors.email = "Please enter a valid email address";
-        isValid = false;
-      }
-    }
-    
-    if (!formData.phone.trim()) {
-      errors.phone = "Phone number is required";
-      isValid = false;
-    }
-    
-    if (!formData.country) {
-      errors.country = "Please select your country";
-      isValid = false;
-    }
-    
-    // If document upload is enabled but no document was uploaded
-    if (formData.hasDocument && !formData.documentUrl) {
-      errors.documentUrl = "Please upload your document or turn off the document upload option";
-      isValid = false;
-    }
-    
+  const validateForm = () => {
+    const { isValid, errors } = validatePersonalInfo(formData);
     setFormErrors(errors);
     
     if (!isValid) {
-      // Still show a toast for general notification
       toast.error("Please correct the highlighted fields");
     }
     
@@ -222,14 +183,13 @@ export const useQuotationForm = () => {
 
   const nextStep = () => {
     if (currentStep === 0) {
-      if (!validateBasicForm()) return;
+      if (!validateForm()) return;
       setCurrentStep(1);
     } else if (currentStep === 1) {
       if (formData.selectedServices.length === 0) {
         toast.error("Please select at least one service");
         return;
       }
-      
       setCurrentStep(2);
     } else if (currentStep === 2) {
       setShowFinalOptions(true);
@@ -243,12 +203,11 @@ export const useQuotationForm = () => {
   };
 
   const handleInquirySubmit = async () => {
-    if (!validateBasicForm()) return;
+    if (!validateForm()) return;
     
     setSubmitting(true);
     
     try {
-      // Include message in the email
       const inquiryData = {
         ...formData,
         message,
@@ -260,11 +219,7 @@ export const useQuotationForm = () => {
       setShowConfirmation(true);
       
       setTimeout(() => {
-        setFormData(initialFormData);
-        setMessage("");
-        setCountry("");
-        setCurrentStep(0);
-        setShowConfirmation(false);
+        resetForm();
       }, 10000);
       
     } catch (error) {
@@ -283,7 +238,6 @@ export const useQuotationForm = () => {
         toast.success("Payment successful! Your quote has been sent to your email.");
       }
       
-      // Include message in the email
       const submissionData = {
         ...formData,
         message,
@@ -296,12 +250,7 @@ export const useQuotationForm = () => {
       setShowFinalOptions(false);
       
       setTimeout(() => {
-        setFormData(initialFormData);
-        setMessage("");
-        setCountry("");
-        setCurrentStep(0);
-        setSelectedServiceId(null);
-        setShowConfirmation(false);
+        resetForm();
       }, 10000);
       
     } catch (error) {
@@ -339,6 +288,6 @@ export const useQuotationForm = () => {
     setInquiryMode,
     country,
     handleCountryChange,
-    formErrors, // Export the form errors
+    formErrors,
   };
 };

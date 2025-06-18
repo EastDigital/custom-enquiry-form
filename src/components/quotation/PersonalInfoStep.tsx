@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import ToggleSwitch from "./ToggleSwitch";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Card, CardContent } from "@/components/ui/card";
+import { validateFileType, getFileTypeExtensions } from "@/utils/formValidation";
 
 interface PersonalInfoStepProps {
   formData: CustomerFormData;
@@ -41,22 +42,14 @@ const PersonalInfoStep: React.FC<PersonalInfoStepProps> = ({
   const [isUploading, setIsUploading] = useState(false);
   const isMobile = useIsMobile();
 
-  const allowedFileTypes = [
-    "application/pdf", 
-    "application/msword", 
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document", 
-    "application/vnd.dwg", 
-    "image/jpeg", 
-    "image/png"
-  ];
   const maxFileSizeMB = 50;
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (!allowedFileTypes.includes(file.type)) {
-      toast.error("Invalid file type. Please upload .doc, .pdf, .dwg, .jpg, or .png files.");
+    if (!validateFileType(file)) {
+      toast.error("Invalid file type. Please upload .pdf, .doc, .docx, .xls, .xlsx, .jpg, or .png files.");
       return;
     }
 
@@ -108,7 +101,7 @@ const PersonalInfoStep: React.FC<PersonalInfoStepProps> = ({
       <Card className="border-0 bg-slate-50 dark:bg-slate-800/50">
         <CardContent className="p-6">
           <div className="flex items-center gap-2 mb-4">
-            <User className="w-5 h-5 text-blue-600" />
+            <User className="w-5 h-5 text-brand-orange" />
             <h3 className="text-lg font-semibold text-slate-800 dark:text-white">Contact Information</h3>
           </div>
           
@@ -121,7 +114,7 @@ const PersonalInfoStep: React.FC<PersonalInfoStepProps> = ({
               <Input
                 id="name"
                 name="name"
-                className={`h-12 border-2 rounded-xl ${formErrors.name ? 'border-red-400 focus:border-red-500' : 'border-slate-200 focus:border-blue-500'} transition-colors`}
+                className={`h-12 border-2 rounded-xl ${formErrors.name ? 'border-red-400 focus:border-red-500' : 'border-slate-200 focus:border-brand-orange'} transition-colors`}
                 placeholder="Enter your full name"
                 value={formData.name}
                 onChange={handlePersonalInfoChange}
@@ -144,7 +137,7 @@ const PersonalInfoStep: React.FC<PersonalInfoStepProps> = ({
                 id="email"
                 name="email"
                 type="email"
-                className={`h-12 border-2 rounded-xl ${formErrors.email ? 'border-red-400 focus:border-red-500' : 'border-slate-200 focus:border-blue-500'} transition-colors`}
+                className={`h-12 border-2 rounded-xl ${formErrors.email ? 'border-red-400 focus:border-red-500' : 'border-slate-200 focus:border-brand-orange'} transition-colors`}
                 placeholder="your@email.com"
                 value={formData.email}
                 onChange={handlePersonalInfoChange}
@@ -167,7 +160,7 @@ const PersonalInfoStep: React.FC<PersonalInfoStepProps> = ({
                 id="phone"
                 name="phone"
                 type="tel"
-                className={`h-12 border-2 rounded-xl ${formErrors.phone ? 'border-red-400 focus:border-red-500' : 'border-slate-200 focus:border-blue-500'} transition-colors`}
+                className={`h-12 border-2 rounded-xl ${formErrors.phone ? 'border-red-400 focus:border-red-500' : 'border-slate-200 focus:border-brand-orange'} transition-colors`}
                 placeholder="+1 (555) 123-4567"
                 value={formData.phone}
                 onChange={handlePersonalInfoChange}
@@ -187,7 +180,7 @@ const PersonalInfoStep: React.FC<PersonalInfoStepProps> = ({
                 Country*
               </Label>
               <Select onValueChange={handleCountryChange} value={country || undefined}>
-                <SelectTrigger className={`h-12 border-2 rounded-xl ${formErrors.country ? 'border-red-400 focus:border-red-500' : 'border-slate-200 focus:border-blue-500'} transition-colors`}>
+                <SelectTrigger className={`h-12 border-2 rounded-xl ${formErrors.country ? 'border-red-400 focus:border-red-500' : 'border-slate-200 focus:border-brand-orange'} transition-colors`}>
                   <SelectValue placeholder="Select your country" />
                 </SelectTrigger>
                 <SelectContent>
@@ -215,7 +208,7 @@ const PersonalInfoStep: React.FC<PersonalInfoStepProps> = ({
       <Card className="border-0 bg-slate-50 dark:bg-slate-800/50">
         <CardContent className="p-6">
           <div className="flex items-center gap-2 mb-4">
-            <MessageSquare className="w-5 h-5 text-purple-600" />
+            <MessageSquare className="w-5 h-5 text-brand-orange" />
             <h3 className="text-lg font-semibold text-slate-800 dark:text-white">Project Details</h3>
           </div>
           
@@ -225,7 +218,7 @@ const PersonalInfoStep: React.FC<PersonalInfoStepProps> = ({
             </Label>
             <Textarea
               id="message"
-              className="min-h-[120px] border-2 border-slate-200 focus:border-blue-500 rounded-xl resize-none transition-colors"
+              className="min-h-[120px] border-2 border-slate-200 focus:border-brand-orange rounded-xl resize-none transition-colors"
               placeholder="Describe your project requirements, goals, timeline, and any specific details..."
               value={message}
               onChange={handleMessageChange}
@@ -238,7 +231,7 @@ const PersonalInfoStep: React.FC<PersonalInfoStepProps> = ({
       <Card className="border-0 bg-slate-50 dark:bg-slate-800/50">
         <CardContent className="p-6">
           <div className="flex items-center gap-2 mb-6">
-            <Clock className="w-5 h-5 text-orange-600" />
+            <Clock className="w-5 h-5 text-brand-orange" />
             <h3 className="text-lg font-semibold text-slate-800 dark:text-white">Project Options</h3>
           </div>
           
@@ -255,7 +248,7 @@ const PersonalInfoStep: React.FC<PersonalInfoStepProps> = ({
                 onCheckedChange={handleUrgentChange}
                 leftLabel="Standard"
                 rightLabel="Urgent"
-                rightColor="text-orange-600"
+                rightColor="text-brand-orange"
               />
             </div>
 
@@ -271,7 +264,7 @@ const PersonalInfoStep: React.FC<PersonalInfoStepProps> = ({
                 onCheckedChange={handleHasDocumentChange}
                 leftLabel="No Files"
                 rightLabel="Upload Files"
-                rightColor="text-green-600"
+                rightColor="text-brand-orange"
               />
             </div>
           </div>
@@ -280,25 +273,25 @@ const PersonalInfoStep: React.FC<PersonalInfoStepProps> = ({
 
       {/* Document Upload Section */}
       {formData.hasDocument && (
-        <Card className="border-0 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20">
+        <Card className="border-0 bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20">
           <CardContent className="p-6">
             <div className="flex items-center gap-2 mb-4">
-              <FileCheck className="w-5 h-5 text-green-600" />
+              <FileCheck className="w-5 h-5 text-brand-orange" />
               <h3 className="text-lg font-semibold text-slate-800 dark:text-white">Upload Documents</h3>
             </div>
             
             <p className="text-sm text-slate-600 dark:text-slate-300 mb-4">
-              Supported formats: PDF, DOC, DWG, JPG, PNG (Max: 50MB)
+              Supported formats: PDF, DOC, DOCX, XLS, XLSX, JPG, PNG (Max: 50MB)
             </p>
             
             {formData.documentUrl ? (
-              <div className="flex items-center gap-3 p-4 bg-white dark:bg-slate-800 rounded-xl border border-green-200 dark:border-green-800">
-                <div className="flex items-center justify-center w-10 h-10 bg-green-100 dark:bg-green-900/50 rounded-lg">
-                  <FileText className="w-5 h-5 text-green-600" />
+              <div className="flex items-center gap-3 p-4 bg-white dark:bg-slate-800 rounded-xl border border-brand-orange/30 dark:border-brand-orange/50">
+                <div className="flex items-center justify-center w-10 h-10 bg-orange-100 dark:bg-orange-900/50 rounded-lg">
+                  <FileText className="w-5 h-5 text-brand-orange" />
                 </div>
                 <div className="flex-1">
                   <p className="font-medium text-slate-800 dark:text-white">{formData.documentName}</p>
-                  <p className="text-sm text-green-600">Successfully uploaded</p>
+                  <p className="text-sm text-brand-orange">Successfully uploaded</p>
                 </div>
                 <Button 
                   variant="outline" 
@@ -316,7 +309,7 @@ const PersonalInfoStep: React.FC<PersonalInfoStepProps> = ({
                   type="file"
                   onChange={handleFileChange}
                   className="hidden"
-                  accept=".pdf,.doc,.docx,.dwg,.jpg,.jpeg,.png"
+                  accept={getFileTypeExtensions()}
                   disabled={isUploading}
                 />
                 <Button
@@ -327,13 +320,13 @@ const PersonalInfoStep: React.FC<PersonalInfoStepProps> = ({
                   className={`w-full h-16 border-2 border-dashed rounded-xl transition-all ${
                     formErrors.documentUrl 
                       ? 'border-red-400 hover:border-red-500' 
-                      : 'border-slate-300 hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20'
+                      : 'border-slate-300 hover:border-brand-orange hover:bg-orange-50/30 dark:hover:bg-orange-900/20'
                   }`}
                 >
                   <div className="flex flex-col items-center gap-2">
                     {isUploading ? (
                       <>
-                        <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                        <div className="w-6 h-6 border-2 border-brand-orange border-t-transparent rounded-full animate-spin"></div>
                         <span className="text-sm">Uploading...</span>
                       </>
                     ) : (

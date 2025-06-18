@@ -19,7 +19,7 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
   leftLabel,
   rightLabel,
   leftColor = "text-slate-600",
-  rightColor = "text-blue-600"
+  rightColor = "text-brand-orange"
 }) => {
   const isPrimaryToggle = id === "inquiry-mode-toggle";
   
@@ -35,7 +35,7 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
           "px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200",
           !checked 
             ? isPrimaryToggle 
-              ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md" 
+              ? "bg-gradient-to-r from-brand-orange to-brand-dark-orange text-white shadow-md" 
               : `${leftColor} bg-slate-100 dark:bg-slate-700`
             : "text-slate-400 hover:text-slate-600"
         )}
@@ -61,7 +61,7 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
           "px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200",
           checked 
             ? isPrimaryToggle 
-              ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md" 
+              ? "bg-gradient-to-r from-brand-orange to-brand-dark-orange text-white shadow-md" 
               : `${rightColor} bg-slate-100 dark:bg-slate-700`
             : "text-slate-400 hover:text-slate-600"
         )}

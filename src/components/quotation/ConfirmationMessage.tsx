@@ -17,16 +17,16 @@ const ConfirmationMessage: React.FC<ConfirmationMessageProps> = ({
   if (!show) return null;
 
   return (
-    <Card className="border-0 bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 dark:from-green-900/20 dark:via-emerald-900/20 dark:to-teal-900/20 shadow-2xl">
+    <Card className="border-0 bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 dark:from-orange-900/20 dark:via-amber-900/20 dark:to-yellow-900/20 shadow-2xl">
       <CardContent className="p-8 text-center">
         <div className="mb-6">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full mb-4 animate-pulse">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-brand-orange to-brand-dark-orange rounded-full mb-4 animate-pulse">
             <CheckCircle className="w-10 h-10 text-white" />
           </div>
         </div>
         
         <div className="space-y-4">
-          <h2 className="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-brand-orange to-brand-dark-orange bg-clip-text text-transparent">
             {title}
           </h2>
           
@@ -45,7 +45,7 @@ const ConfirmationMessage: React.FC<ConfirmationMessageProps> = ({
             </div>
           </div>
           
-          <div className="inline-flex items-center gap-2 bg-white/60 dark:bg-slate-800/60 px-4 py-2 rounded-full text-sm text-slate-600 dark:text-slate-300 mt-6">
+          <div className="inline-flex items-center gap-2 bg-white/60 dark:bg-slate-800/60 px-4 py-2 rounded-full text-sm text-brand-orange dark:text-brand-light-orange mt-6">
             <Sparkles className="w-4 h-4" />
             Our team is reviewing your request
           </div>

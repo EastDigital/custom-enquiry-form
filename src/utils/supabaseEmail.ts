@@ -10,40 +10,45 @@ const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYm
 
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-export const sendQuotationEmails = async (formData: CustomerFormData) => {
+export const sendQuotationEmails = async (formData: CustomerFormData & { message?: string }) => {
   try {
+    // Extract message from the form data
+    const { message, ...restFormData } = formData;
+    
     // Generate email templates
     const customerTemplate = generateCustomerEmailHTML(
-      formData.name,
-      formData.email,
-      formData.phone,
-      formData.selectedServices,
-      formData.urgent,
-      formData.hasDocument ? formData.documentUrl : undefined,
-      formData.hasDocument ? formData.documentName : undefined
+      restFormData.name,
+      restFormData.email,
+      restFormData.phone,
+      restFormData.selectedServices,
+      restFormData.urgent,
+      restFormData.hasDocument ? restFormData.documentUrl : undefined,
+      restFormData.hasDocument ? restFormData.documentName : undefined
     );
     
     const adminTemplate = generateAdminEmailHTML(
-      formData.name,
-      formData.email,
-      formData.phone,
-      formData.selectedServices,
-      formData.urgent,
-      formData.hasDocument ? formData.documentUrl : undefined,
-      formData.hasDocument ? formData.documentName : undefined
+      restFormData.name,
+      restFormData.email,
+      restFormData.phone,
+      restFormData.selectedServices,
+      restFormData.urgent,
+      restFormData.hasDocument ? restFormData.documentUrl : undefined,
+      restFormData.hasDocument ? restFormData.documentName : undefined,
+      message
     );
 
     // Call the Supabase Edge Function to send emails
     const { data, error } = await supabase.functions.invoke('send-quotation-emails', {
       body: {
-        customerEmail: formData.email,
-        customerName: formData.name,
-        customerPhone: formData.phone,
-        selectedServices: formData.selectedServices,
-        urgent: formData.urgent,
-        hasDocument: formData.hasDocument,
-        documentUrl: formData.documentUrl,
-        documentName: formData.documentName,
+        customerEmail: restFormData.email,
+        customerName: restFormData.name,
+        customerPhone: restFormData.phone,
+        selectedServices: restFormData.selectedServices,
+        urgent: restFormData.urgent,
+        hasDocument: restFormData.hasDocument,
+        documentUrl: restFormData.documentUrl,
+        documentName: restFormData.documentName,
+        message,
         customerTemplate,
         adminTemplate
       }

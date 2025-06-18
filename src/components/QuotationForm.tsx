@@ -3,9 +3,8 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { useQuotationForm } from "@/hooks/useQuotationForm";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { CheckCircle, ArrowRight, ArrowLeft, Sparkles } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Sparkles, ArrowRight, ArrowLeft } from "lucide-react";
 
 // Import refactored components
 import PersonalInfoStep from "./quotation/PersonalInfoStep";
@@ -102,15 +101,15 @@ const QuotationForm = () => {
   const confirmationDetails = getConfirmationMessage();
   
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-8 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-orange-50 to-amber-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-8 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Header Section */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-full text-sm font-medium mb-4">
+          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-brand-orange to-brand-dark-orange text-white px-4 py-2 rounded-full text-sm font-medium mb-4">
             <Sparkles className="w-4 h-4" />
             Professional Services Inquiry
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-brand-orange via-amber-600 to-brand-dark-orange bg-clip-text text-transparent mb-4">
             Get Your Custom Quote
           </h1>
           <p className="text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
@@ -138,7 +137,7 @@ const QuotationForm = () => {
                   leftLabel="Quick Inquiry"
                   rightLabel="Detailed Quote"
                   leftColor="text-slate-600"
-                  rightColor="text-blue-600"
+                  rightColor="text-brand-orange"
                 />
               </div>
             </div>
@@ -168,7 +167,7 @@ const QuotationForm = () => {
                         <Button 
                           variant="outline" 
                           onClick={prevStep}
-                          className="flex items-center gap-2 px-6 py-3 rounded-xl border-2 hover:border-blue-300 transition-all duration-200"
+                          className="flex items-center gap-2 px-6 py-3 rounded-xl border-2 hover:border-brand-orange transition-all duration-200"
                         >
                           <ArrowLeft className="w-4 h-4" />
                           Back
@@ -181,7 +180,7 @@ const QuotationForm = () => {
                         <Button 
                           onClick={handleInquirySubmit} 
                           disabled={submitting} 
-                          className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2"
+                          className="bg-gradient-to-r from-brand-orange to-brand-dark-orange hover:from-brand-dark-orange hover:to-brand-dark-orange text-white px-8 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2"
                           size={isMobile ? "lg" : "default"}
                         >
                           {submitting ? (
@@ -199,7 +198,7 @@ const QuotationForm = () => {
                       ) : (
                         <Button 
                           onClick={nextStep} 
-                          className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2"
+                          className="bg-gradient-to-r from-brand-orange to-brand-dark-orange hover:from-brand-dark-orange hover:to-brand-dark-orange text-white px-8 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2"
                           size={isMobile ? "lg" : "default"}
                         >
                           {currentStep === 2 ? "Get Quote" : "Continue"}
