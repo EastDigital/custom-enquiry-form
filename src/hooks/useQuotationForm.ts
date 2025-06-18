@@ -1,4 +1,3 @@
-
 import { useFormState } from "./useFormState";
 import { validatePersonalInfo } from "@/utils/formValidation";
 import { serviceCategories } from "@/data/servicesData";
@@ -23,8 +22,8 @@ export const useQuotationForm = () => {
     setShowConfirmation,
     message,
     setMessage,
-    inquiryMode,
-    setInquiryMode,
+    instantProposal,
+    setInstantProposal,
     country,
     setCountry,
     formErrors,
@@ -192,7 +191,11 @@ export const useQuotationForm = () => {
       }
       setCurrentStep(2);
     } else if (currentStep === 2) {
-      setShowFinalOptions(true);
+      if (instantProposal) {
+        setShowFinalOptions(true);
+      } else {
+        handleInquirySubmit();
+      }
     }
   };
 
@@ -208,13 +211,13 @@ export const useQuotationForm = () => {
     setSubmitting(true);
     
     try {
-      const inquiryData = {
+      const submissionData = {
         ...formData,
         message,
       };
       
-      await sendQuotationEmails(inquiryData);
-      toast.success("Your inquiry has been sent successfully!");
+      await sendQuotationEmails(submissionData);
+      toast.success("Your tailored proposal request has been submitted successfully!");
       
       setShowConfirmation(true);
       
@@ -235,7 +238,7 @@ export const useQuotationForm = () => {
     
     try {
       if (paidOption) {
-        toast.success("Payment successful! Your quote has been sent to your email.");
+        toast.success("Payment successful! Your instant proposal has been sent to your email.");
       }
       
       const submissionData = {
@@ -244,7 +247,7 @@ export const useQuotationForm = () => {
       };
       
       await sendQuotationEmails(submissionData);
-      toast.success("Your quote has been sent to your email!");
+      toast.success("Your instant proposal has been sent to your email!");
       
       setShowConfirmation(true);
       setShowFinalOptions(false);
@@ -284,8 +287,8 @@ export const useQuotationForm = () => {
     handleInquirySubmit,
     message,
     handleMessageChange,
-    inquiryMode,
-    setInquiryMode,
+    instantProposal,
+    setInstantProposal,
     country,
     handleCountryChange,
     formErrors,

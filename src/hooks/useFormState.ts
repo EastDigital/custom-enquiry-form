@@ -23,7 +23,7 @@ export const useFormState = () => {
   const [countdown, setCountdown] = useState(10);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [message, setMessage] = useState("");
-  const [inquiryMode, setInquiryMode] = useState(true);
+  const [instantProposal, setInstantProposal] = useState(false);
   const [country, setCountry] = useState("");
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
@@ -55,8 +55,8 @@ export const useFormState = () => {
     setShowConfirmation,
     message,
     setMessage,
-    inquiryMode,
-    setInquiryMode,
+    instantProposal,
+    setInstantProposal,
     country,
     setCountry,
     formErrors,
