@@ -17,34 +17,30 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
   rightLabel,
 }) => {
   return (
-    <div className="flex items-center gap-2">
-      {/* Tailored Proposal Button */}
+    <div className="flex items-center justify-center gap-4">
+      {/* Labels */}
+      <span className="text-sm font-medium text-white">{leftLabel}</span>
+
+      {/* Switch Container */}
       <button
         type="button"
-        onClick={() => onCheckedChange(false)}
+        aria-pressed={checked}
+        onClick={() => onCheckedChange(!checked)}
         className={cn(
-          "px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 text-white",
-          !checked
-            ? "bg-[#FF6900] shadow"
-            : "bg-slate-700 dark:bg-slate-800"
+          "relative w-20 h-10 rounded-full bg-white/10 backdrop-blur-lg shadow-inner border border-white/20 transition-all duration-300 ease-in-out",
+          checked ? "bg-[#FF6900]/30" : "bg-slate-300/20"
         )}
       >
-        {leftLabel}
+        {/* Sliding Head (Thumb) */}
+        <span
+          className={cn(
+            "absolute top-1 left-1 h-8 w-8 rounded-full bg-white bg-opacity-70 backdrop-blur-sm shadow-md transition-all duration-300 ease-in-out border border-white/30",
+            checked ? "translate-x-10 bg-[#FF6900]" : "translate-x-0"
+          )}
+        />
       </button>
 
-      {/* Instant Proposal Button */}
-      <button
-        type="button"
-        onClick={() => onCheckedChange(true)}
-        className={cn(
-          "px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 text-white",
-          checked
-            ? "bg-[#FF6900] shadow"
-            : "bg-slate-700 dark:bg-slate-800"
-        )}
-      >
-        {rightLabel}
-      </button>
+      <span className="text-sm font-medium text-white">{rightLabel}</span>
     </div>
   );
 };
