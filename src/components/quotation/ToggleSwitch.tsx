@@ -7,8 +7,6 @@ interface ToggleSwitchProps {
   onCheckedChange: (checked: boolean) => void;
   leftLabel: string;
   rightLabel: string;
-  leftColor?: string;
-  rightColor?: string;
 }
 
 const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
@@ -17,8 +15,6 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
   onCheckedChange,
   leftLabel,
   rightLabel,
-  leftColor = "text-white",
-  rightColor = "text-white",
 }) => {
   return (
     <div className="flex items-center gap-2">
@@ -27,10 +23,10 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
         type="button"
         onClick={() => onCheckedChange(false)}
         className={cn(
-          "px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200",
+          "px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 text-white",
           !checked
-            ? "text-white bg-[#FF6900] shadow"
-            : "text-white bg-slate-700 dark:bg-slate-700"
+            ? "bg-[#FF6900] shadow"
+            : "bg-slate-700 dark:bg-slate-800"
         )}
       >
         {leftLabel}
@@ -41,10 +37,10 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
         type="button"
         onClick={() => onCheckedChange(true)}
         className={cn(
-          "px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200",
+          "px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 text-white",
           checked
-            ? "text-white bg-[#FF6900] shadow"
-            : "text-white bg-slate-700 dark:bg-slate-700"
+            ? "bg-[#FF6900] shadow"
+            : "bg-slate-700 dark:bg-slate-800"
         )}
       >
         {rightLabel}
