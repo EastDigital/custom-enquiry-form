@@ -104,3 +104,20 @@
 .form-label {
   @apply text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70;
 }
+.glass-card::before {
+  content: "";
+  position: absolute;
+  top: -20%;
+  left: -20%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at top left, rgba(255,255,255,0.15), transparent);
+  transform: rotate(25deg);
+  pointer-events: none;
+  animation: float-shine 8s ease-in-out infinite;
+}
+
+@keyframes float-shine {
+  0%, 100% { transform: rotate(25deg) translate(0,0); }
+  50% { transform: rotate(25deg) translate(10%,10%); }
+}
