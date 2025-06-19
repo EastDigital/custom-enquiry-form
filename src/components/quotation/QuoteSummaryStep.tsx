@@ -1,14 +1,15 @@
 
 import React from "react";
 import { CustomerFormData } from "@/types/form";
-import { serviceCategories } from "@/data/servicesData";
+import { ServiceCategory } from "@/data/servicesData";
 import { FileText } from "lucide-react";
 
 interface QuoteSummaryStepProps {
   formData: CustomerFormData;
+  serviceCategories: ServiceCategory[];
 }
 
-const QuoteSummaryStep: React.FC<QuoteSummaryStepProps> = ({ formData }) => {
+const QuoteSummaryStep: React.FC<QuoteSummaryStepProps> = ({ formData, serviceCategories }) => {
   return (
     <div className="space-y-4">
       <h2 className="text-2xl font-semibold text-center">Quote Summary</h2>

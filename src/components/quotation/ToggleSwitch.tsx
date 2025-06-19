@@ -1,3 +1,4 @@
+
 import React from "react";
 import { cn } from "@/lib/utils";
 
@@ -7,6 +8,8 @@ interface ToggleSwitchProps {
   onCheckedChange: (checked: boolean) => void;
   leftLabel: string;
   rightLabel: string;
+  leftColor?: string;
+  rightColor?: string;
 }
 
 const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
@@ -15,10 +18,12 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
   onCheckedChange,
   leftLabel,
   rightLabel,
+  leftColor,
+  rightColor,
 }) => {
   return (
     <div className="flex items-center gap-2">
-      {/* Tailored Proposal Button */}
+      {/* Left Button */}
       <button
         type="button"
         onClick={() => onCheckedChange(false)}
@@ -32,7 +37,7 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
         {leftLabel}
       </button>
 
-      {/* Instant Proposal Button */}
+      {/* Right Button */}
       <button
         type="button"
         onClick={() => onCheckedChange(true)}

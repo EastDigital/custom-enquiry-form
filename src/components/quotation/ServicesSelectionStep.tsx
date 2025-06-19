@@ -1,7 +1,7 @@
 
 import React from "react";
 import { CustomerFormData, ServiceSelection } from "@/types/form";
-import { serviceCategories } from "@/data/servicesData";
+import { ServiceCategory } from "@/data/servicesData";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -17,6 +17,7 @@ interface ServicesSelectionStepProps {
   handleQuantityChange: (serviceId: string, subServiceId: string, quantity: number) => void;
   removeService: (serviceId: string, subServiceId: string) => void;
   isServiceSelected: (serviceId: string, subServiceId: string) => boolean;
+  serviceCategories: ServiceCategory[];
 }
 
 const ServicesSelectionStep: React.FC<ServicesSelectionStepProps> = ({
@@ -27,6 +28,7 @@ const ServicesSelectionStep: React.FC<ServicesSelectionStepProps> = ({
   handleQuantityChange,
   removeService,
   isServiceSelected,
+  serviceCategories,
 }) => {
   return (
     <div className="space-y-6">
