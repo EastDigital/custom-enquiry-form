@@ -44,6 +44,38 @@ export type Database = {
           },
         ]
       }
+      admin_sessions: {
+        Row: {
+          admin_user_id: string
+          created_at: string | null
+          expires_at: string
+          id: string
+          session_token: string
+        }
+        Insert: {
+          admin_user_id: string
+          created_at?: string | null
+          expires_at: string
+          id?: string
+          session_token: string
+        }
+        Update: {
+          admin_user_id?: string
+          created_at?: string | null
+          expires_at?: string
+          id?: string
+          session_token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_sessions_admin_user_id_fkey"
+            columns: ["admin_user_id"]
+            isOneToOne: false
+            referencedRelation: "admin_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       admin_users: {
         Row: {
           created_at: string | null
@@ -269,9 +301,24 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
+      generate_admin_otp: {
+        Args: { admin_email: string }
+        Returns: string
+      }
       is_admin_user: {
         Args: Record<PropertyKey, never>
         Returns: boolean
+      }
+      validate_admin_session: {
+        Args: { session_token: string }
+        Returns: string
+      }
+      verify_admin_otp: {
+        Args: { admin_email: string; otp_token: string }
+        Returns: {
+          session_token: string
+          admin_user_id: string
+        }[]
       }
     }
     Enums: {

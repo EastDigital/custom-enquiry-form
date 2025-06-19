@@ -1,18 +1,21 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { CustomerFormData } from '@/types/form';
+import { getServicePricing } from './adminUtils';
 
 export const saveCustomerInquiry = async (
   formData: CustomerFormData & { message?: string },
   instantProposal: boolean = false
 ) => {
   try {
-    // Calculate total amount
-    const totalAmount = formData.selectedServices.reduce((total, service) => {
-      // We'll need to fetch the price from the sub_services table
-      // For now, we'll calculate it based on the static data
-      return total + (service.quantity || 1) * 100; // Placeholder calculation
-    }, 0);
+    // Calculate total amount by fetching actual prices from the database
+    let totalAmount = 0;
+    for (const service of formData.selectedServices) {
+      const pricing = await getServicePricing(service.serviceId, service.subServiceId);
+      if (pricing) {
+        totalAmount += (service.quantity || 1) * pricing.price;
+      }
+    }
 
     // Insert customer inquiry
     const { data: inquiry, error: inquiryError } = await supabase
@@ -38,23 +41,32 @@ export const saveCustomerInquiry = async (
       throw inquiryError;
     }
 
-    // Insert selected services
+    // Insert selected services with actual pricing
     if (formData.selectedServices.length > 0) {
-      const serviceInserts = formData.selectedServices.map(service => ({
-        inquiry_id: inquiry.id,
-        service_id: service.serviceId,
-        sub_service_id: service.subServiceId,
-        quantity: service.quantity || 1,
-        unit_price: 100, // We'll need to fetch this from the database
-        total_price: (service.quantity || 1) * 100, // Placeholder calculation
-      }));
+      const serviceInserts = [];
+      
+      for (const service of formData.selectedServices) {
+        const pricing = await getServicePricing(service.serviceId, service.subServiceId);
+        if (pricing) {
+          serviceInserts.push({
+            inquiry_id: inquiry.id,
+            service_id: service.serviceId,
+            sub_service_id: service.subServiceId,
+            quantity: service.quantity || 1,
+            unit_price: pricing.price,
+            total_price: (service.quantity || 1) * pricing.price,
+          });
+        }
+      }
 
-      const { error: servicesError } = await supabase
-        .from('customer_inquiry_services')
-        .insert(serviceInserts);
+      if (serviceInserts.length > 0) {
+        const { error: servicesError } = await supabase
+          .from('customer_inquiry_services')
+          .insert(serviceInserts);
 
-      if (servicesError) {
-        throw servicesError;
+        if (servicesError) {
+          throw servicesError;
+        }
       }
     }
 
