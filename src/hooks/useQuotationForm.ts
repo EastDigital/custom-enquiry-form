@@ -1,8 +1,10 @@
+
 import { useFormState } from "./useFormState";
 import { validatePersonalInfo } from "@/utils/formValidation";
-import { serviceCategories } from "@/data/servicesData";
+import { useServices } from "@/hooks/useServices";
 import { toast } from "sonner";
 import { sendQuotationEmails } from '@/utils/supabaseEmail';
+import { saveCustomerInquiry } from '@/utils/supabaseInquiries';
 
 export const useQuotationForm = () => {
   const {
@@ -30,6 +32,8 @@ export const useQuotationForm = () => {
     setFormErrors,
     resetForm,
   } = useFormState();
+
+  const { serviceCategories, loading: servicesLoading } = useServices();
 
   const handlePersonalInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -216,6 +220,10 @@ export const useQuotationForm = () => {
         message,
       };
       
+      // Save to database
+      await saveCustomerInquiry(submissionData, false);
+      
+      // Send emails
       await sendQuotationEmails(submissionData);
       toast.success("Your tailored proposal request has been submitted successfully!");
       
@@ -237,15 +245,19 @@ export const useQuotationForm = () => {
     setSubmitting(true);
     
     try {
-      if (paidOption) {
-        toast.success("Payment successful! Your instant proposal has been sent to your email.");
-      }
-      
       const submissionData = {
         ...formData,
         message,
       };
       
+      // Save to database
+      await saveCustomerInquiry(submissionData, true);
+      
+      if (paidOption) {
+        toast.success("Payment successful! Your instant proposal has been sent to your email.");
+      }
+      
+      // Send emails
       await sendQuotationEmails(submissionData);
       toast.success("Your instant proposal has been sent to your email!");
       
@@ -292,5 +304,7 @@ export const useQuotationForm = () => {
     country,
     handleCountryChange,
     formErrors,
+    serviceCategories,
+    servicesLoading,
   };
 };

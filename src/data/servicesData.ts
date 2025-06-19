@@ -1,4 +1,3 @@
-
 export type SubService = {
   id: string;
   name: string;
@@ -13,6 +12,7 @@ export type ServiceCategory = {
   subServices: SubService[];
 };
 
+// Keep the static data as fallback, but now it will be loaded from Supabase
 export const serviceCategories: ServiceCategory[] = [
   {
     id: "branding",

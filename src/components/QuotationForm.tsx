@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useQuotationForm } from "@/hooks/useQuotationForm";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Card, CardContent } from "@/components/ui/card";
-import { Sparkles, ArrowRight, ArrowLeft } from "lucide-react";
+import { Sparkles, ArrowRight, ArrowLeft, Loader2 } from "lucide-react";
 
 // Import refactored components
 import PersonalInfoStep from "./quotation/PersonalInfoStep";
@@ -44,7 +44,9 @@ const QuotationForm = () => {
     setInstantProposal,
     country,
     handleCountryChange,
-    formErrors
+    formErrors,
+    serviceCategories,
+    servicesLoading,
   } = useQuotationForm();
 
   const renderStep = () => {
@@ -52,9 +54,17 @@ const QuotationForm = () => {
       case 0:
         return <PersonalInfoStep formData={formData} handlePersonalInfoChange={handlePersonalInfoChange} handleUrgentChange={handleUrgentChange} handleHasDocumentChange={handleHasDocumentChange} handleDocumentUpload={handleDocumentUpload} message={message} handleMessageChange={handleMessageChange} country={country} handleCountryChange={handleCountryChange} formErrors={formErrors} />;
       case 1:
-        return <ServicesSelectionStep formData={formData} selectedServiceId={selectedServiceId} handleServiceCategoryChange={handleServiceCategoryChange} handleSubServiceChange={handleSubServiceChange} handleQuantityChange={handleQuantityChange} removeService={removeService} isServiceSelected={isServiceSelected} />;
+        if (servicesLoading) {
+          return (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="w-8 h-8 animate-spin text-brand-orange" />
+              <span className="ml-2 text-slate-600">Loading services...</span>
+            </div>
+          );
+        }
+        return <ServicesSelectionStep formData={formData} selectedServiceId={selectedServiceId} handleServiceCategoryChange={handleServiceCategoryChange} handleSubServiceChange={handleSubServiceChange} handleQuantityChange={handleQuantityChange} removeService={removeService} isServiceSelected={isServiceSelected} serviceCategories={serviceCategories} />;
       case 2:
-        return <QuoteSummaryStep formData={formData} />;
+        return <QuoteSummaryStep formData={formData} serviceCategories={serviceCategories} />;
       default:
         return null;
     }
@@ -120,7 +130,7 @@ const QuotationForm = () => {
                           Back
                         </Button> : <div></div>}
                       
-                      {!instantProposal && currentStep === 2 ? <Button onClick={handleInquirySubmit} disabled={submitting} className="bg-gradient-to-r from-brand-orange to-brand-dark-orange hover:from-brand-dark-orange hover:to-brand-dark-orange text-white px-8 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2" size={isMobile ? "lg" : "default"}>
+                      {!instantProposal && currentStep === 2 ? <Button onClick={handleInquirySubmit} disabled={submitting || servicesLoading} className="bg-gradient-to-r from-brand-orange to-brand-dark-orange hover:from-brand-dark-orange hover:to-brand-dark-orange text-white px-8 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2" size={isMobile ? "lg" : "default"}>
                           {submitting ? <>
                               <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                               Submitting...
@@ -128,7 +138,7 @@ const QuotationForm = () => {
                               Submit Request
                               <ArrowRight className="w-4 h-4" />
                             </>}
-                        </Button> : <Button onClick={nextStep} className="bg-gradient-to-r from-brand-orange to-brand-dark-orange hover:from-brand-dark-orange hover:to-brand-dark-orange text-white px-8 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2" size={isMobile ? "lg" : "default"}>
+                        </Button> : <Button onClick={nextStep} disabled={servicesLoading} className="bg-gradient-to-r from-brand-orange to-brand-dark-orange hover:from-brand-dark-orange hover:to-brand-dark-orange text-white px-8 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2" size={isMobile ? "lg" : "default"}>
                           {currentStep === 2 ? (instantProposal ? "Get Instant Proposal" : "Submit Request") : "Continue"}
                           <ArrowRight className="w-4 h-4" />
                         </Button>}
