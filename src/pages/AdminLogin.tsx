@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,11 +22,26 @@ const AdminLogin = () => {
 
     setLoading(true);
     try {
+      // Generate OTP using the database function
       const { data, error } = await supabase.rpc('generate_admin_otp', {
         admin_email: email
       });
 
       if (error) throw error;
+
+      // Send OTP via email using the edge function
+      const { error: emailError } = await supabase.functions.invoke('send-admin-otp', {
+        body: {
+          adminEmail: email,
+          otpToken: data
+        }
+      });
+
+      if (emailError) {
+        console.error('Email sending error:', emailError);
+        toast.error('Failed to send OTP email. Please try again.');
+        return;
+      }
 
       toast.success('OTP sent! Check your email.');
       setStep('otp');
@@ -101,7 +115,7 @@ const AdminLogin = () => {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@example.com"
+                  placeholder="info@eastdigital.in"
                   required
                 />
               </div>
