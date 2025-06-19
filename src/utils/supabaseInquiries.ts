@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { CustomerFormData } from '@/types/form';
 import { getServicePricing } from './adminUtils';
@@ -74,25 +73,5 @@ export const saveCustomerInquiry = async (
   } catch (error) {
     console.error('Error saving customer inquiry:', error);
     throw error;
-  }
-};
-
-export const getServicePricing = async (serviceId: string, subServiceId: string) => {
-  try {
-    const { data, error } = await supabase
-      .from('sub_services')
-      .select('price, unit, minimum_units')
-      .eq('id', subServiceId)
-      .eq('service_id', serviceId)
-      .single();
-
-    if (error) {
-      throw error;
-    }
-
-    return data;
-  } catch (error) {
-    console.error('Error fetching service pricing:', error);
-    return null;
   }
 };
