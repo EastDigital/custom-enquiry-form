@@ -1,4 +1,3 @@
-
 import React from "react";
 import { CustomerFormData } from "@/types/form";
 import { ServiceCategory } from "@/data/servicesData";
@@ -19,7 +18,7 @@ const QuoteSummaryStep: React.FC<QuoteSummaryStepProps> = ({
   instantProposal, 
   setInstantProposal 
 }) => {
-  // Calculate estimated total
+  // Keep calculation function for backend use but don't display the result
   const calculateEstimatedTotal = () => {
     return formData.selectedServices.reduce((total, service) => {
       const serviceCategory = serviceCategories.find((sc) => sc.id === service.serviceId);
@@ -31,6 +30,7 @@ const QuoteSummaryStep: React.FC<QuoteSummaryStepProps> = ({
     }, 0);
   };
 
+  // Keep this for backend calculations but don't use in UI
   const estimatedTotal = calculateEstimatedTotal();
 
   return (
@@ -84,7 +84,7 @@ const QuoteSummaryStep: React.FC<QuoteSummaryStepProps> = ({
         </CardContent>
       </Card>
       
-      {/* Selected Services */}
+      {/* Selected Services - Hide all pricing information */}
       <Card className="border-0 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm">
         <CardContent className="p-6">
           <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
@@ -98,11 +98,9 @@ const QuoteSummaryStep: React.FC<QuoteSummaryStepProps> = ({
               
               if (!serviceCategory || !subService) return null;
               
-              const serviceTotal = subService.price * (service.quantity || 1);
-              
               return (
                 <div key={`${service.serviceId}-${service.subServiceId}`} className="flex justify-between items-center p-3 bg-white/80 dark:bg-slate-700/60 rounded-xl">
-                  <div>
+                  <div className="flex-1">
                     <p className="font-medium text-slate-800 dark:text-white">
                       {serviceCategory.name}: {subService.name}
                     </p>
@@ -112,23 +110,18 @@ const QuoteSummaryStep: React.FC<QuoteSummaryStepProps> = ({
                       </p>
                     )}
                   </div>
-                  <div className="text-right">
-                    <p className="font-semibold text-brand-orange">${serviceTotal}</p>
-                    <CheckCircle className="w-5 h-5 text-green-500 ml-auto" />
+                  <div className="flex items-center">
+                    <CheckCircle className="w-5 h-5 text-green-500" />
                   </div>
                 </div>
               );
             })}
           </div>
           
-          {/* Estimated Total */}
+          {/* Remove estimated total display */}
           <div className="mt-4 pt-4 border-t border-slate-200/60 dark:border-slate-600/60">
-            <div className="flex justify-between items-center">
-              <span className="text-lg font-semibold text-slate-800 dark:text-white">Estimated Total:</span>
-              <span className="text-2xl font-bold text-brand-orange">${estimatedTotal}</span>
-            </div>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-              *Final pricing may vary based on project requirements
+            <p className="text-sm text-slate-500 dark:text-slate-400 text-center">
+              Your customized pricing will be calculated and included in your proposal
             </p>
           </div>
         </CardContent>
