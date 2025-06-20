@@ -65,7 +65,8 @@ export const generateCustomerEmailHTML = (
   selectedServices: ServiceSelection[],
   urgent: boolean = false,
   documentUrl?: string,
-  documentName?: string
+  documentName?: string,
+  aiProposal?: string
 ) => {
   const total = calculateTotal(selectedServices, urgent);
   const urgencyBadgeColor = urgent ? BRAND_ORANGE : "#4ade80";
@@ -75,6 +76,15 @@ export const generateCustomerEmailHTML = (
     <div style="margin: 15px 0; padding: 10px; background-color: #f8fafc; border-radius: 8px;">
       <p><strong>Attached Document:</strong> ${documentName}</p>
       <p>You can access your document here: <a href="${documentUrl}" target="_blank" style="color: ${BRAND_ORANGE};">View Document</a></p>
+    </div>
+  ` : '';
+
+  const proposalSection = aiProposal ? `
+    <div style="margin: 20px 0; padding: 20px; background-color: #f8fafc; border-radius: 8px; border-left: 4px solid ${BRAND_ORANGE};">
+      <h3 style="margin-top: 0; color: ${BRAND_DARK_ORANGE};">Your AI-Generated Proposal:</h3>
+      <div style="background-color: white; padding: 15px; border-radius: 5px;">
+        ${aiProposal}
+      </div>
     </div>
   ` : '';
   
@@ -130,6 +140,7 @@ export const generateCustomerEmailHTML = (
             </div>
             
             ${documentSection}
+            ${proposalSection}
             
             <h3>Services Selected:</h3>
             <table>
@@ -158,11 +169,11 @@ export const generateCustomerEmailHTML = (
             
             <p>If you have any questions, please don't hesitate to contact us. We are excited to work with you on this project!</p>
             
-            <p>Best regards,<br>Your Company Name</p>
+            <p>Best regards,<br>East Digital</p>
             
             <div class="footer">
               <p>This email was sent to ${email} because you requested a quote from our services.</p>
-              <p>&copy; ${new Date().getFullYear()} Your Company Name. All rights reserved.</p>
+              <p>&copy; ${new Date().getFullYear()} East Digital. All rights reserved.</p>
             </div>
           </div>
         </div>
@@ -179,9 +190,11 @@ export const generateAdminEmailHTML = (
   urgent: boolean = false,
   documentUrl?: string,
   documentName?: string,
-  message?: string
+  message?: string,
+  aiProposal?: string,
+  totalAmount?: number
 ) => {
-  const total = calculateTotal(selectedServices, urgent);
+  const total = totalAmount || calculateTotal(selectedServices, urgent);
   const urgencyBadgeColor = urgent ? BRAND_ORANGE : "#4ade80";
   const urgencyText = urgent ? "Urgent" : "Not So Urgent";
   
@@ -193,6 +206,15 @@ export const generateAdminEmailHTML = (
     <div style="margin: 15px 0; padding: 15px; background-color: #f8fafc; border-radius: 8px; border-left: 4px solid ${BRAND_ORANGE};">
       <h3 style="margin-top: 0; color: ${BRAND_DARK_ORANGE};">Customer Message:</h3>
       <p style="white-space: pre-line;">${message}</p>
+    </div>
+  ` : '';
+
+  const proposalSection = aiProposal ? `
+    <div style="margin: 20px 0; padding: 20px; background-color: #f1f5f9; border-radius: 8px; border-left: 4px solid ${BRAND_DARK_ORANGE};">
+      <h3 style="margin-top: 0; color: ${BRAND_DARK_ORANGE};">AI-Generated Proposal Sent to Customer:</h3>
+      <div style="background-color: white; padding: 15px; border-radius: 5px; max-height: 300px; overflow-y: auto;">
+        ${aiProposal}
+      </div>
     </div>
   ` : '';
   
@@ -241,6 +263,7 @@ export const generateAdminEmailHTML = (
             </div>
             
             ${messageSection}
+            ${proposalSection}
             
             <h3>Selected Services:</h3>
             <table>
