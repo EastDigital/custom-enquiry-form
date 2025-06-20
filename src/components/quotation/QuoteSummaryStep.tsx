@@ -2,7 +2,7 @@
 import React from "react";
 import { CustomerFormData } from "@/types/form";
 import { ServiceCategory } from "@/data/servicesData";
-import { FileText, CheckCircle, Zap } from "lucide-react";
+import { FileText, CheckCircle, Zap, Brain, Clock, DollarSign } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 
@@ -19,6 +19,20 @@ const QuoteSummaryStep: React.FC<QuoteSummaryStepProps> = ({
   instantProposal, 
   setInstantProposal 
 }) => {
+  // Calculate estimated total
+  const calculateEstimatedTotal = () => {
+    return formData.selectedServices.reduce((total, service) => {
+      const serviceCategory = serviceCategories.find((sc) => sc.id === service.serviceId);
+      const subService = serviceCategory?.subServices.find((ss) => ss.id === service.subServiceId);
+      if (subService) {
+        return total + (subService.price * (service.quantity || 1));
+      }
+      return total;
+    }, 0);
+  };
+
+  const estimatedTotal = calculateEstimatedTotal();
+
   return (
     <div className="space-y-6">
       <div className="text-center mb-8">
@@ -84,6 +98,8 @@ const QuoteSummaryStep: React.FC<QuoteSummaryStepProps> = ({
               
               if (!serviceCategory || !subService) return null;
               
+              const serviceTotal = subService.price * (service.quantity || 1);
+              
               return (
                 <div key={`${service.serviceId}-${service.subServiceId}`} className="flex justify-between items-center p-3 bg-white/80 dark:bg-slate-700/60 rounded-xl">
                   <div>
@@ -96,10 +112,24 @@ const QuoteSummaryStep: React.FC<QuoteSummaryStepProps> = ({
                       </p>
                     )}
                   </div>
-                  <CheckCircle className="w-5 h-5 text-green-500" />
+                  <div className="text-right">
+                    <p className="font-semibold text-brand-orange">${serviceTotal}</p>
+                    <CheckCircle className="w-5 h-5 text-green-500 ml-auto" />
+                  </div>
                 </div>
               );
             })}
+          </div>
+          
+          {/* Estimated Total */}
+          <div className="mt-4 pt-4 border-t border-slate-200/60 dark:border-slate-600/60">
+            <div className="flex justify-between items-center">
+              <span className="text-lg font-semibold text-slate-800 dark:text-white">Estimated Total:</span>
+              <span className="text-2xl font-bold text-brand-orange">${estimatedTotal}</span>
+            </div>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+              *Final pricing may vary based on project requirements
+            </p>
           </div>
         </CardContent>
       </Card>
@@ -117,31 +147,51 @@ const QuoteSummaryStep: React.FC<QuoteSummaryStepProps> = ({
             <div className="flex-1">
               <label htmlFor="instant-proposal" className="cursor-pointer">
                 <div className="flex items-center gap-2 mb-2">
-                  <Zap className="w-5 h-5 text-brand-orange" />
+                  <Brain className="w-5 h-5 text-brand-orange" />
                   <h4 className="text-lg font-semibold text-slate-800 dark:text-white">
-                    Generate Instant Proposal
+                    AI-Powered Instant Proposal
                   </h4>
                   <span className="bg-brand-orange text-white px-3 py-1 rounded-full text-sm font-medium">
                     $10
                   </span>
                 </div>
-                <p className="text-slate-600 dark:text-slate-300 text-sm">
-                  Get your detailed proposal immediately with comprehensive project analysis, cost breakdown, and timeline. 
-                  Perfect for urgent projects that need quick turnaround.
+                <p className="text-slate-600 dark:text-slate-300 text-sm mb-3">
+                  Get your detailed proposal immediately with AI-generated comprehensive project analysis, 
+                  cost breakdown, timeline, and personalized recommendations based on your specific requirements.
                 </p>
-                <div className="mt-3 space-y-1">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
-                    <CheckCircle className="w-4 h-4 text-green-500" />
-                    Instant email delivery
+                    <Zap className="w-4 h-4 text-brand-orange" />
+                    Instant AI generation & delivery
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
+                    <Brain className="w-4 h-4 text-green-500" />
+                    Personalized project analysis
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
+                    <DollarSign className="w-4 h-4 text-green-500" />
+                    Detailed cost breakdown
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
+                    <Clock className="w-4 h-4 text-green-500" />
+                    Realistic timeline & milestones
                   </div>
                   <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
                     <CheckCircle className="w-4 h-4 text-green-500" />
-                    Detailed cost breakdown
+                    ROI analysis & projections
                   </div>
                   <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
                     <CheckCircle className="w-4 h-4 text-green-500" />
                     Priority support included
                   </div>
+                </div>
+                
+                <div className="mt-3 p-3 bg-white/60 dark:bg-slate-700/40 rounded-lg">
+                  <p className="text-xs text-slate-600 dark:text-slate-400">
+                    <strong>How it works:</strong> Our AI analyzes your requirements, compares them with thousands 
+                    of similar projects, and generates a comprehensive proposal tailored specifically to your needs. 
+                    Perfect for urgent projects requiring immediate attention.
+                  </p>
                 </div>
               </label>
             </div>

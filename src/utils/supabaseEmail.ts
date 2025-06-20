@@ -10,10 +10,16 @@ const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYm
 
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-export const sendQuotationEmails = async (formData: CustomerFormData & { message?: string }) => {
+export const sendQuotationEmails = async (
+  formData: CustomerFormData & { 
+    message?: string; 
+    aiProposal?: string; 
+    totalAmount?: number; 
+  }
+) => {
   try {
-    // Extract message from the form data
-    const { message, ...restFormData } = formData;
+    // Extract message and AI proposal from the form data
+    const { message, aiProposal, totalAmount, ...restFormData } = formData;
     
     // Generate email templates
     const customerTemplate = generateCustomerEmailHTML(
@@ -23,7 +29,8 @@ export const sendQuotationEmails = async (formData: CustomerFormData & { message
       restFormData.selectedServices,
       restFormData.urgent,
       restFormData.hasDocument ? restFormData.documentUrl : undefined,
-      restFormData.hasDocument ? restFormData.documentName : undefined
+      restFormData.hasDocument ? restFormData.documentName : undefined,
+      aiProposal
     );
     
     const adminTemplate = generateAdminEmailHTML(
@@ -34,7 +41,9 @@ export const sendQuotationEmails = async (formData: CustomerFormData & { message
       restFormData.urgent,
       restFormData.hasDocument ? restFormData.documentUrl : undefined,
       restFormData.hasDocument ? restFormData.documentName : undefined,
-      message
+      message,
+      aiProposal,
+      totalAmount
     );
 
     // Call the Supabase Edge Function to send emails
@@ -49,6 +58,8 @@ export const sendQuotationEmails = async (formData: CustomerFormData & { message
         documentUrl: restFormData.documentUrl,
         documentName: restFormData.documentName,
         message,
+        aiProposal,
+        totalAmount,
         customerTemplate,
         adminTemplate
       }

@@ -4,6 +4,7 @@ import { useServices } from "@/hooks/useServices";
 import { toast } from "sonner";
 import { sendQuotationEmails } from '@/utils/supabaseEmail';
 import { saveCustomerInquiry } from '@/utils/supabaseInquiries';
+import { supabase } from '@/integrations/supabase/client';
 
 export const useQuotationForm = () => {
   const {
@@ -216,7 +217,7 @@ export const useQuotationForm = () => {
       };
       
       // Save to database
-      await saveCustomerInquiry(submissionData, false);
+      const inquiry = await saveCustomerInquiry(submissionData, false);
       
       // Send emails
       await sendQuotationEmails(submissionData);
@@ -236,7 +237,33 @@ export const useQuotationForm = () => {
     }
   };
 
+  const generateAIProposal = async (inquiryId: string) => {
+    try {
+      console.log('Generating AI proposal for inquiry:', inquiryId);
+      
+      const { data, error } = await supabase.functions.invoke('generate-ai-proposal', {
+        body: { inquiryId }
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to generate proposal');
+      }
+
+      console.log('AI proposal generated successfully');
+      return data;
+    } catch (error) {
+      console.error('Error generating AI proposal:', error);
+      throw error;
+    }
+  };
+
   const handleSubmit = async (paidOption: boolean) => {
+    if (!validateForm()) return;
+    
     setSubmitting(true);
     
     try {
@@ -246,15 +273,34 @@ export const useQuotationForm = () => {
       };
       
       // Save to database
-      await saveCustomerInquiry(submissionData, true);
+      const inquiry = await saveCustomerInquiry(submissionData, paidOption);
       
-      if (paidOption) {
-        toast.success("Payment successful! Your instant proposal has been sent to your email.");
+      if (paidOption && instantProposal) {
+        toast.success("Processing your instant proposal...");
+        
+        // Generate AI-powered proposal
+        try {
+          const proposalData = await generateAIProposal(inquiry.id);
+          toast.success("Your AI-generated proposal has been created and sent to your email!");
+          
+          // Send enhanced emails with AI proposal
+          await sendQuotationEmails({
+            ...submissionData,
+            aiProposal: proposalData.proposal,
+            totalAmount: proposalData.totalAmount
+          });
+        } catch (proposalError) {
+          console.error('AI proposal generation failed:', proposalError);
+          toast.error("Proposal generation failed, but your request has been saved. We'll send a manual proposal shortly.");
+          
+          // Fallback to regular email
+          await sendQuotationEmails(submissionData);
+        }
+      } else {
+        // Send regular emails for tailored proposals
+        await sendQuotationEmails(submissionData);
+        toast.success("Your proposal request has been submitted successfully!");
       }
-      
-      // Send emails
-      await sendQuotationEmails(submissionData);
-      toast.success("Your instant proposal has been sent to your email!");
       
       setShowConfirmation(true);
       setShowFinalOptions(false);
