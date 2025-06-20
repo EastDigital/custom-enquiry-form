@@ -98,7 +98,7 @@ const PersonalInfoStep: React.FC<PersonalInfoStepProps> = ({
       </div>
       
       {/* Contact Information */}
-      <Card className="border-0 bg-slate-50 dark:bg-slate-800/50">
+      <Card className="border-0 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm">
         <CardContent className="p-6">
           <div className="flex items-center gap-2 mb-4">
             <User className="w-5 h-5 text-brand-orange" />
@@ -114,7 +114,7 @@ const PersonalInfoStep: React.FC<PersonalInfoStepProps> = ({
               <Input
                 id="name"
                 name="name"
-                className={`h-12 border-2 rounded-xl ${formErrors.name ? 'border-red-400 focus:border-red-500' : 'border-slate-200 focus:border-brand-orange'} transition-colors`}
+                className={`h-12 rounded-xl transition-all duration-200 ${formErrors.name ? 'border-red-300 focus:border-red-500 focus:ring-red-200' : 'border-slate-200 dark:border-slate-600 focus:border-brand-orange focus:ring-orange-100'}`}
                 placeholder="Enter your full name"
                 value={formData.name}
                 onChange={handlePersonalInfoChange}
@@ -137,7 +137,7 @@ const PersonalInfoStep: React.FC<PersonalInfoStepProps> = ({
                 id="email"
                 name="email"
                 type="email"
-                className={`h-12 border-2 rounded-xl ${formErrors.email ? 'border-red-400 focus:border-red-500' : 'border-slate-200 focus:border-brand-orange'} transition-colors`}
+                className={`h-12 rounded-xl transition-all duration-200 ${formErrors.email ? 'border-red-300 focus:border-red-500 focus:ring-red-200' : 'border-slate-200 dark:border-slate-600 focus:border-brand-orange focus:ring-orange-100'}`}
                 placeholder="your@email.com"
                 value={formData.email}
                 onChange={handlePersonalInfoChange}
@@ -160,7 +160,7 @@ const PersonalInfoStep: React.FC<PersonalInfoStepProps> = ({
                 id="phone"
                 name="phone"
                 type="tel"
-                className={`h-12 border-2 rounded-xl ${formErrors.phone ? 'border-red-400 focus:border-red-500' : 'border-slate-200 focus:border-brand-orange'} transition-colors`}
+                className={`h-12 rounded-xl transition-all duration-200 ${formErrors.phone ? 'border-red-300 focus:border-red-500 focus:ring-red-200' : 'border-slate-200 dark:border-slate-600 focus:border-brand-orange focus:ring-orange-100'}`}
                 placeholder="+1 (555) 123-4567"
                 value={formData.phone}
                 onChange={handlePersonalInfoChange}
@@ -180,7 +180,7 @@ const PersonalInfoStep: React.FC<PersonalInfoStepProps> = ({
                 Country*
               </Label>
               <Select onValueChange={handleCountryChange} value={country || undefined}>
-                <SelectTrigger className={`h-12 border-2 rounded-xl ${formErrors.country ? 'border-red-400 focus:border-red-500' : 'border-slate-200 focus:border-brand-orange'} transition-colors`}>
+                <SelectTrigger className={`h-12 rounded-xl transition-all duration-200 ${formErrors.country ? 'border-red-300 focus:border-red-500 focus:ring-red-200' : 'border-slate-200 dark:border-slate-600 focus:border-brand-orange'}`}>
                   <SelectValue placeholder="Select your country" />
                 </SelectTrigger>
                 <SelectContent>
@@ -205,7 +205,7 @@ const PersonalInfoStep: React.FC<PersonalInfoStepProps> = ({
       </Card>
 
       {/* Project Details */}
-      <Card className="border-0 bg-slate-50 dark:bg-slate-800/50">
+      <Card className="border-0 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm">
         <CardContent className="p-6">
           <div className="flex items-center gap-2 mb-4">
             <MessageSquare className="w-5 h-5 text-brand-orange" />
@@ -218,7 +218,7 @@ const PersonalInfoStep: React.FC<PersonalInfoStepProps> = ({
             </Label>
             <Textarea
               id="message"
-              className="min-h-[120px] border-2 border-slate-200 focus:border-brand-orange rounded-xl resize-none transition-colors"
+              className="min-h-[120px] border-slate-200 dark:border-slate-600 focus:border-brand-orange rounded-xl resize-none transition-all duration-200"
               placeholder="Describe your project requirements, goals, timeline, and any specific details..."
               value={message}
               onChange={handleMessageChange}
@@ -228,7 +228,7 @@ const PersonalInfoStep: React.FC<PersonalInfoStepProps> = ({
       </Card>
 
       {/* Project Options */}
-      <Card className="border-0 bg-slate-50 dark:bg-slate-800/50">
+      <Card className="border-0 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm">
         <CardContent className="p-6">
           <div className="flex items-center gap-2 mb-6">
             <Clock className="w-5 h-5 text-brand-orange" />
@@ -237,7 +237,7 @@ const PersonalInfoStep: React.FC<PersonalInfoStepProps> = ({
           
           <div className="space-y-6">
             {/* Urgency Toggle */}
-            <div className="flex items-center justify-between p-4 bg-white dark:bg-slate-700/50 rounded-xl border border-slate-200 dark:border-slate-600">
+            <div className="flex items-center justify-between p-4 bg-white/80 dark:bg-slate-700/60 rounded-xl border border-slate-200/60 dark:border-slate-600/60">
               <div>
                 <h4 className="font-medium text-slate-800 dark:text-white">Priority Level</h4>
                 <p className="text-sm text-slate-600 dark:text-slate-300">How quickly do you need this completed?</p>
@@ -253,7 +253,7 @@ const PersonalInfoStep: React.FC<PersonalInfoStepProps> = ({
             </div>
 
             {/* Document Upload Toggle */}
-            <div className="flex items-center justify-between p-4 bg-white dark:bg-slate-700/50 rounded-xl border border-slate-200 dark:border-slate-600">
+            <div className="flex items-center justify-between p-4 bg-white/80 dark:bg-slate-700/60 rounded-xl border border-slate-200/60 dark:border-slate-600/60">
               <div>
                 <h4 className="font-medium text-slate-800 dark:text-white">Supporting Documents</h4>
                 <p className="text-sm text-slate-600 dark:text-slate-300">Do you have files to share with us?</p>
@@ -273,7 +273,7 @@ const PersonalInfoStep: React.FC<PersonalInfoStepProps> = ({
 
       {/* Document Upload Section */}
       {formData.hasDocument && (
-        <Card className="border-0 bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20">
+        <Card className="border-0 bg-gradient-to-br from-orange-50/80 to-amber-50/80 dark:from-orange-900/30 dark:to-amber-900/30 backdrop-blur-sm">
           <CardContent className="p-6">
             <div className="flex items-center gap-2 mb-4">
               <FileCheck className="w-5 h-5 text-brand-orange" />
@@ -285,7 +285,7 @@ const PersonalInfoStep: React.FC<PersonalInfoStepProps> = ({
             </p>
             
             {formData.documentUrl ? (
-              <div className="flex items-center gap-3 p-4 bg-white dark:bg-slate-800 rounded-xl border border-brand-orange/30 dark:border-brand-orange/50">
+              <div className="flex items-center gap-3 p-4 bg-white/80 dark:bg-slate-800/80 rounded-xl border border-brand-orange/30 dark:border-brand-orange/50">
                 <div className="flex items-center justify-center w-10 h-10 bg-orange-100 dark:bg-orange-900/50 rounded-lg">
                   <FileText className="w-5 h-5 text-brand-orange" />
                 </div>

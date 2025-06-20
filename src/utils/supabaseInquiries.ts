@@ -1,22 +1,15 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { CustomerFormData } from '@/types/form';
-import { getServicePricing } from './adminUtils';
 
 export const saveCustomerInquiry = async (
   formData: CustomerFormData & { message?: string },
   instantProposal: boolean = false
 ) => {
   try {
-    // Calculate total amount by fetching actual prices from the database
-    let totalAmount = 0;
-    for (const service of formData.selectedServices) {
-      const pricing = await getServicePricing(service.serviceId, service.subServiceId);
-      if (pricing) {
-        totalAmount += (service.quantity || 1) * pricing.price;
-      }
-    }
+    console.log('Saving customer inquiry:', { formData, instantProposal });
 
-    // Insert customer inquiry
+    // Insert customer inquiry with default pricing
     const { data: inquiry, error: inquiryError } = await supabase
       .from('customer_inquiries')
       .insert({
@@ -30,43 +23,40 @@ export const saveCustomerInquiry = async (
         document_url: formData.documentUrl,
         document_name: formData.documentName,
         proposal_type: instantProposal ? 'instant' : 'tailored',
-        total_amount: totalAmount,
+        total_amount: 0, // Will be calculated on backend
         status: 'pending',
       })
       .select()
       .single();
 
     if (inquiryError) {
+      console.error('Error saving inquiry:', inquiryError);
       throw inquiryError;
     }
 
-    // Insert selected services with actual pricing
+    console.log('Inquiry saved successfully:', inquiry);
+
+    // Insert selected services without pricing (backend will handle pricing)
     if (formData.selectedServices.length > 0) {
-      const serviceInserts = [];
-      
-      for (const service of formData.selectedServices) {
-        const pricing = await getServicePricing(service.serviceId, service.subServiceId);
-        if (pricing) {
-          serviceInserts.push({
-            inquiry_id: inquiry.id,
-            service_id: service.serviceId,
-            sub_service_id: service.subServiceId,
-            quantity: service.quantity || 1,
-            unit_price: pricing.price,
-            total_price: (service.quantity || 1) * pricing.price,
-          });
-        }
+      const serviceInserts = formData.selectedServices.map(service => ({
+        inquiry_id: inquiry.id,
+        service_id: service.serviceId,
+        sub_service_id: service.subServiceId,
+        quantity: service.quantity || 1,
+        unit_price: 0, // Backend will calculate
+        total_price: 0, // Backend will calculate
+      }));
+
+      const { error: servicesError } = await supabase
+        .from('customer_inquiry_services')
+        .insert(serviceInserts);
+
+      if (servicesError) {
+        console.error('Error saving services:', servicesError);
+        throw servicesError;
       }
 
-      if (serviceInserts.length > 0) {
-        const { error: servicesError } = await supabase
-          .from('customer_inquiry_services')
-          .insert(serviceInserts);
-
-        if (servicesError) {
-          throw servicesError;
-        }
-      }
+      console.log('Services saved successfully');
     }
 
     return inquiry;

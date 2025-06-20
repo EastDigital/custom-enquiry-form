@@ -1,3 +1,4 @@
+
 import React from "react";
 import { CustomerFormData } from "@/types/form";
 import { ServiceCategory } from "@/data/servicesData";
@@ -26,7 +27,7 @@ const QuoteSummaryStep: React.FC<QuoteSummaryStepProps> = ({
       </div>
       
       {/* Customer Information */}
-      <Card className="border-0 bg-slate-50 dark:bg-slate-800/50">
+      <Card className="border-0 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm">
         <CardContent className="p-6">
           <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
             <CheckCircle className="w-5 h-5 text-green-500" />
@@ -70,7 +71,7 @@ const QuoteSummaryStep: React.FC<QuoteSummaryStepProps> = ({
       </Card>
       
       {/* Selected Services */}
-      <Card className="border-0 bg-slate-50 dark:bg-slate-800/50">
+      <Card className="border-0 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm">
         <CardContent className="p-6">
           <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
             <CheckCircle className="w-5 h-5 text-green-500" />
@@ -84,7 +85,7 @@ const QuoteSummaryStep: React.FC<QuoteSummaryStepProps> = ({
               if (!serviceCategory || !subService) return null;
               
               return (
-                <div key={`${service.serviceId}-${service.subServiceId}`} className="flex justify-between items-center p-3 bg-white dark:bg-slate-700 rounded-xl">
+                <div key={`${service.serviceId}-${service.subServiceId}`} className="flex justify-between items-center p-3 bg-white/80 dark:bg-slate-700/60 rounded-xl">
                   <div>
                     <p className="font-medium text-slate-800 dark:text-white">
                       {serviceCategory.name}: {subService.name}
@@ -104,7 +105,7 @@ const QuoteSummaryStep: React.FC<QuoteSummaryStepProps> = ({
       </Card>
 
       {/* Instant Proposal Option */}
-      <Card className="border-2 border-brand-orange/30 bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20">
+      <Card className="border-2 border-brand-orange/40 bg-gradient-to-br from-orange-50/80 to-amber-50/80 dark:from-orange-900/30 dark:to-amber-900/30 backdrop-blur-sm">
         <CardContent className="p-6">
           <div className="flex items-start gap-4">
             <Checkbox
@@ -120,7 +121,7 @@ const QuoteSummaryStep: React.FC<QuoteSummaryStepProps> = ({
                   <h4 className="text-lg font-semibold text-slate-800 dark:text-white">
                     Generate Instant Proposal
                   </h4>
-                  <span className="bg-brand-orange text-white px-2 py-1 rounded-full text-sm font-medium">
+                  <span className="bg-brand-orange text-white px-3 py-1 rounded-full text-sm font-medium">
                     $10
                   </span>
                 </div>

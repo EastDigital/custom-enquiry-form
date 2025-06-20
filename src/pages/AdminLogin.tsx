@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -34,31 +35,35 @@ const AdminLogin = () => {
         throw otpError;
       }
 
-      console.log('OTP generated successfully, sending email...');
+      console.log('OTP generated successfully:', otpToken);
 
-      // Send OTP via email using the edge function
-      const { data: emailData, error: emailError } = await supabase.functions.invoke('send-admin-otp', {
-        body: {
-          adminEmail: email,
-          otpToken: otpToken
-        }
+      // For development, show the OTP in console and toast
+      console.log('Development OTP:', otpToken);
+      toast.success(`OTP generated successfully! Development OTP: ${otpToken}`, {
+        duration: 10000,
       });
+      
+      // Try to send email but don't fail if it doesn't work
+      try {
+        const { data: emailData, error: emailError } = await supabase.functions.invoke('send-admin-otp', {
+          body: {
+            adminEmail: email,
+            otpToken: otpToken
+          }
+        });
 
-      if (emailError) {
-        console.error('Email sending error:', emailError);
-        // For development, show the OTP in console and toast
-        console.log('Development OTP:', otpToken);
-        toast.success(`OTP generated! For development: ${otpToken}`);
-        setStep('otp');
-        return;
+        if (!emailError) {
+          console.log('Email sent successfully:', emailData);
+          toast.success('OTP sent to your email!');
+        }
+      } catch (emailError) {
+        console.warn('Email sending failed, but OTP is available in console:', emailError);
       }
 
-      console.log('Email sent successfully:', emailData);
-      toast.success('OTP sent! Check your email.');
       setStep('otp');
     } catch (error: any) {
       console.error('Error requesting OTP:', error);
-      toast.error(error.message || 'Failed to send OTP');
+      toast.error(error.message || 'Failed to generate OTP');
     } finally {
       setLoading(false);
     }
@@ -86,12 +91,16 @@ const AdminLogin = () => {
 
       console.log('OTP verification successful:', data);
 
-      // Store session token in localStorage
-      localStorage.setItem('admin_session_token', data[0].session_token);
-      localStorage.setItem('admin_user_id', data[0].admin_user_id);
-      
-      toast.success('Login successful!');
-      navigate('/admin');
+      if (data && data.length > 0) {
+        // Store session token in localStorage
+        localStorage.setItem('admin_session_token', data[0].session_token);
+        localStorage.setItem('admin_user_id', data[0].admin_user_id);
+        
+        toast.success('Login successful!');
+        navigate('/admin');
+      } else {
+        throw new Error('Invalid response from server');
+      }
     } catch (error: any) {
       console.error('Error verifying OTP:', error);
       toast.error(error.message || 'Invalid OTP');
@@ -110,8 +119,8 @@ const AdminLogin = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-orange-50 to-amber-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex items-center justify-center py-8 px-4">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-orange-50/50 to-amber-100/50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex items-center justify-center py-8 px-4">
+      <Card className="w-full max-w-md bg-white/80 dark:bg-white/5 backdrop-blur-sm border border-white/30 dark:border-white/10">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold bg-gradient-to-r from-brand-orange to-brand-dark-orange bg-clip-text text-transparent">
             Admin Login
@@ -134,6 +143,7 @@ const AdminLogin = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="info@eastdigital.in"
+                  className="h-12 rounded-xl border-slate-200 dark:border-slate-600 focus:border-brand-orange transition-all duration-200"
                   required
                 />
               </div>
@@ -147,6 +157,7 @@ const AdminLogin = () => {
                   onChange={(e) => setOtp(e.target.value)}
                   placeholder="123456"
                   maxLength={6}
+                  className="h-12 rounded-xl border-slate-200 dark:border-slate-600 focus:border-brand-orange transition-all duration-200"
                   required
                 />
                 <Button
@@ -161,7 +172,7 @@ const AdminLogin = () => {
             )}
             <Button 
               type="submit" 
-              className="w-full bg-gradient-to-r from-brand-orange to-brand-dark-orange"
+              className="w-full bg-gradient-to-r from-brand-orange to-brand-dark-orange rounded-xl h-12"
               disabled={loading}
             >
               {loading ? 'Processing...' : step === 'email' ? 'Send OTP' : 'Verify & Login'}
@@ -169,9 +180,9 @@ const AdminLogin = () => {
           </form>
           
           {/* Development helper */}
-          <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-            <p className="text-xs text-yellow-800">
-              <strong>Development Mode:</strong> If email fails, the OTP will be shown in the browser console and toast notification.
+          <div className="mt-4 p-3 bg-yellow-50/80 dark:bg-yellow-900/20 border border-yellow-200/60 dark:border-yellow-800/60 rounded-lg">
+            <p className="text-xs text-yellow-800 dark:text-yellow-200">
+              <strong>Development Mode:</strong> The OTP will be shown in the browser console and toast notification for testing purposes.
             </p>
           </div>
         </CardContent>
@@ -179,3 +190,5 @@ const AdminLogin = () => {
     </div>
   );
 };
+
+export default AdminLogin;

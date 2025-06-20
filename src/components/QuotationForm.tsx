@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { useQuotationForm } from "@/hooks/useQuotationForm";
@@ -89,7 +90,7 @@ const QuotationForm = () => {
 
   const confirmationDetails = getConfirmationMessage();
 
-  return <div className="min-h-screen bg-gradient-to-br from-slate-50 via-orange-50 to-amber-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-8 px-4">
+  return <div className="min-h-screen bg-gradient-to-br from-slate-50 via-orange-50/50 to-amber-100/50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-8 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Header Section */}
         <div className="text-center mb-8">
@@ -109,14 +110,14 @@ const QuotationForm = () => {
               </div>}
 
             {/* Main Form Card */}
-            <Card className="relative bg-white/80 dark:bg-white/10 backdrop-blur-sm border border-white/30 rounded-2xl shadow-xl overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-orange-50/20 pointer-events-none"></div>
+            <Card className="relative bg-white/70 dark:bg-white/5 backdrop-blur-sm border border-white/30 dark:border-white/10 rounded-2xl shadow-xl overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-orange-50/10 pointer-events-none"></div>
               <CardContent className="relative p-8">
                 {showFinalOptions ? <QuoteOptions submitting={submitting} countdown={countdown} handleSubmit={handleSubmit} instantProposal={instantProposal} /> : <>
                     {renderStep()}
                     
                     {/* Navigation Buttons */}
-                    <div className="flex justify-between items-center mt-8 pt-6 border-t border-slate-200 dark:border-slate-700">
+                    <div className="flex justify-between items-center mt-8 pt-6 border-t border-slate-200/60 dark:border-slate-700/60">
                       {currentStep > 0 ? <Button variant="outline" onClick={prevStep} className="flex items-center gap-2 px-6 py-3 rounded-xl border hover:border-brand-orange transition-all duration-200">
                           <ArrowLeft className="w-4 h-4" />
                           Back
