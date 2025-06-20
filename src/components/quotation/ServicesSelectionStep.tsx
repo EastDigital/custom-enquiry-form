@@ -1,4 +1,3 @@
-
 import React from "react";
 import { CustomerFormData, ServiceSelection } from "@/types/form";
 import { ServiceCategory } from "@/data/servicesData";
@@ -40,7 +39,7 @@ const ServicesSelectionStep: React.FC<ServicesSelectionStepProps> = ({
       <div>
         <Label htmlFor="serviceCategory" className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 block">Service Category*</Label>
         <Select onValueChange={handleServiceCategoryChange} value={selectedServiceId || undefined}>
-          <SelectTrigger className="h-12 border-2 rounded-xl border-slate-200 focus:border-brand-orange transition-colors">
+          <SelectTrigger className="h-12 border rounded-xl border-slate-200 focus:border-brand-orange transition-colors">
             <SelectValue placeholder="Select a service category" />
           </SelectTrigger>
           <SelectContent>
@@ -68,16 +67,18 @@ const ServicesSelectionStep: React.FC<ServicesSelectionStepProps> = ({
                   <div key={subService.id} className="space-y-3">
                     <div 
                       className={cn(
-                        "flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-all",
+                        "flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-all",
                         isServiceSelected(selectedServiceId, subService.id)
-                          ? "bg-orange-50 dark:bg-orange-900/20 border-brand-orange"
-                          : "bg-white dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700"
+                          ? "bg-orange-50 dark:bg-orange-900/20 border-brand-orange shadow-sm"
+                          : "bg-white dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-slate-300"
                       )}
                       onClick={() => handleSubServiceChange(selectedServiceId, subService.id)}
                     >
                       <div>
                         <h4 className="font-medium text-slate-800 dark:text-white">{subService.name}</h4>
-                        <p className="text-sm text-brand-orange font-medium">${subService.price}{subService.unit ? ` per ${subService.unit.replace('per ', '')}` : ""}</p>
+                        <p className="text-sm text-slate-500 dark:text-slate-400">
+                          Professional service{subService.unit ? ` (${subService.unit})` : ""}
+                        </p>
                       </div>
                       <div className={cn(
                         "w-6 h-6 rounded-full flex items-center justify-center transition-colors",
@@ -100,7 +101,7 @@ const ServicesSelectionStep: React.FC<ServicesSelectionStepProps> = ({
                             <Input
                               id={`quantity-${subService.id}`}
                               type="number"
-                              className="w-24 h-10 border-2 border-slate-200 focus:border-brand-orange rounded-lg text-center"
+                              className="w-24 h-10 border border-slate-200 focus:border-brand-orange rounded-lg text-center"
                               min={subService.minimumUnits || 1}
                               value={formData.selectedServices.find(
                                 (s) => s.serviceId === selectedServiceId && s.subServiceId === subService.id
@@ -135,10 +136,6 @@ const ServicesSelectionStep: React.FC<ServicesSelectionStepProps> = ({
                 
                 if (!serviceCategory || !subService) return null;
                 
-                const price = service.quantity 
-                  ? subService.price * service.quantity 
-                  : subService.price;
-                
                 return (
                   <div 
                     key={`${service.serviceId}-${service.subServiceId}`} 
@@ -151,7 +148,7 @@ const ServicesSelectionStep: React.FC<ServicesSelectionStepProps> = ({
                       </div>
                       {service.quantity && subService.unit && (
                         <p className="text-sm text-slate-600 dark:text-slate-300">
-                          {service.quantity} {subService.unit.replace('per ', '')} × ${subService.price} = ${price}
+                          {service.quantity} {subService.unit.replace('per ', '')}
                         </p>
                       )}
                     </div>

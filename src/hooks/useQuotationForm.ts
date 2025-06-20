@@ -1,4 +1,3 @@
-
 import { useFormState } from "./useFormState";
 import { validatePersonalInfo } from "@/utils/formValidation";
 import { useServices } from "@/hooks/useServices";
@@ -195,11 +194,7 @@ export const useQuotationForm = () => {
       }
       setCurrentStep(2);
     } else if (currentStep === 2) {
-      if (instantProposal) {
-        setShowFinalOptions(true);
-      } else {
-        handleInquirySubmit();
-      }
+      // This will be handled by the submit buttons in the summary step
     }
   };
 

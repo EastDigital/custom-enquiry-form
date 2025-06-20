@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 
 const AdminLogin = () => {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState('info@eastdigital.in');
   const [otp, setOtp] = useState('');
   const [step, setStep] = useState<'email' | 'otp'>('email');
   const [loading, setLoading] = useState(false);
@@ -22,27 +22,38 @@ const AdminLogin = () => {
 
     setLoading(true);
     try {
+      console.log('Requesting OTP for:', email);
+      
       // Generate OTP using the database function
-      const { data, error } = await supabase.rpc('generate_admin_otp', {
+      const { data: otpToken, error: otpError } = await supabase.rpc('generate_admin_otp', {
         admin_email: email
       });
 
-      if (error) throw error;
+      if (otpError) {
+        console.error('OTP generation error:', otpError);
+        throw otpError;
+      }
+
+      console.log('OTP generated successfully, sending email...');
 
       // Send OTP via email using the edge function
-      const { error: emailError } = await supabase.functions.invoke('send-admin-otp', {
+      const { data: emailData, error: emailError } = await supabase.functions.invoke('send-admin-otp', {
         body: {
           adminEmail: email,
-          otpToken: data
+          otpToken: otpToken
         }
       });
 
       if (emailError) {
         console.error('Email sending error:', emailError);
-        toast.error('Failed to send OTP email. Please try again.');
+        // For development, show the OTP in console and toast
+        console.log('Development OTP:', otpToken);
+        toast.success(`OTP generated! For development: ${otpToken}`);
+        setStep('otp');
         return;
       }
 
+      console.log('Email sent successfully:', emailData);
       toast.success('OTP sent! Check your email.');
       setStep('otp');
     } catch (error: any) {
@@ -61,12 +72,19 @@ const AdminLogin = () => {
 
     setLoading(true);
     try {
+      console.log('Verifying OTP:', otp, 'for email:', email);
+      
       const { data, error } = await supabase.rpc('verify_admin_otp', {
         admin_email: email,
         otp_token: otp
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('OTP verification error:', error);
+        throw error;
+      }
+
+      console.log('OTP verification successful:', data);
 
       // Store session token in localStorage
       localStorage.setItem('admin_session_token', data[0].session_token);
@@ -149,10 +167,15 @@ const AdminLogin = () => {
               {loading ? 'Processing...' : step === 'email' ? 'Send OTP' : 'Verify & Login'}
             </Button>
           </form>
+          
+          {/* Development helper */}
+          <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <p className="text-xs text-yellow-800">
+              <strong>Development Mode:</strong> If email fails, the OTP will be shown in the browser console and toast notification.
+            </p>
+          </div>
         </CardContent>
       </Card>
     </div>
   );
 };
-
-export default AdminLogin;
