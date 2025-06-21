@@ -194,8 +194,6 @@ export const useQuotationForm = () => {
         return;
       }
       setCurrentStep(2);
-    } else if (currentStep === 2) {
-      // This will be handled by the submit buttons in the summary step
     }
   };
 
@@ -206,7 +204,12 @@ export const useQuotationForm = () => {
   };
 
   const handleInquirySubmit = async () => {
-    if (!validateForm()) return;
+    console.log('Starting inquiry submission...');
+    
+    if (!validateForm()) {
+      console.log('Form validation failed');
+      return;
+    }
     
     setSubmitting(true);
     
@@ -216,13 +219,23 @@ export const useQuotationForm = () => {
         message,
       };
       
+      console.log('Submitting data:', submissionData);
+      
       // Save to database
       const inquiry = await saveCustomerInquiry(submissionData, false);
+      console.log('Inquiry saved:', inquiry);
       
       // Send emails
-      await sendQuotationEmails(submissionData);
-      toast.success("Your tailored proposal request has been submitted successfully!");
+      try {
+        await sendQuotationEmails(submissionData);
+        console.log('Emails sent successfully');
+      } catch (emailError) {
+        console.error('Email sending failed:', emailError);
+        // Don't fail the whole process if emails fail
+        toast.warning("Request submitted successfully, but email notification failed. We'll contact you directly.");
+      }
       
+      toast.success("Your tailored proposal request has been submitted successfully!");
       setShowConfirmation(true);
       
       setTimeout(() => {
@@ -230,8 +243,8 @@ export const useQuotationForm = () => {
       }, 10000);
       
     } catch (error) {
-      console.error('Error:', error);
-      toast.error("There was an error processing your request. Please try again.");
+      console.error('Error in handleInquirySubmit:', error);
+      toast.error(`There was an error processing your request: ${error.message}`);
     } finally {
       setSubmitting(false);
     }
@@ -262,7 +275,12 @@ export const useQuotationForm = () => {
   };
 
   const handleSubmit = async (paidOption: boolean) => {
-    if (!validateForm()) return;
+    console.log('Starting paid submission...');
+    
+    if (!validateForm()) {
+      console.log('Form validation failed');
+      return;
+    }
     
     setSubmitting(true);
     
@@ -272,8 +290,11 @@ export const useQuotationForm = () => {
         message,
       };
       
+      console.log('Submitting paid data:', submissionData);
+      
       // Save to database
       const inquiry = await saveCustomerInquiry(submissionData, paidOption);
+      console.log('Paid inquiry saved:', inquiry);
       
       if (paidOption && instantProposal) {
         toast.success("Processing your instant proposal...");
@@ -310,8 +331,8 @@ export const useQuotationForm = () => {
       }, 10000);
       
     } catch (error) {
-      console.error('Error:', error);
-      toast.error("There was an error processing your request. Please try again.");
+      console.error('Error in handleSubmit:', error);
+      toast.error(`There was an error processing your request: ${error.message}`);
     } finally {
       setSubmitting(false);
     }

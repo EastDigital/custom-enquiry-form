@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,6 +12,7 @@ const AdminLogin = () => {
   const [otp, setOtp] = useState('');
   const [step, setStep] = useState<'email' | 'otp'>('email');
   const [loading, setLoading] = useState(false);
+  const [generatedOtp, setGeneratedOtp] = useState('');
   const navigate = useNavigate();
 
   const requestOtp = async () => {
@@ -25,6 +25,19 @@ const AdminLogin = () => {
     try {
       console.log('Requesting OTP for:', email);
       
+      // Test database connection first
+      const { data: testData, error: testError } = await supabase
+        .from('admin_users')
+        .select('id')
+        .limit(1);
+
+      if (testError) {
+        console.error('Database connection test failed:', testError);
+        throw new Error(`Database connection failed: ${testError.message}`);
+      }
+
+      console.log('Database connection successful');
+      
       // Generate OTP using the database function
       const { data: otpToken, error: otpError } = await supabase.rpc('generate_admin_otp', {
         admin_email: email
@@ -32,15 +45,15 @@ const AdminLogin = () => {
 
       if (otpError) {
         console.error('OTP generation error:', otpError);
-        throw otpError;
+        throw new Error(`OTP generation failed: ${otpError.message}`);
       }
 
       console.log('OTP generated successfully:', otpToken);
+      setGeneratedOtp(otpToken);
 
       // For development, show the OTP in console and toast
-      console.log('Development OTP:', otpToken);
       toast.success(`OTP generated successfully! Development OTP: ${otpToken}`, {
-        duration: 10000,
+        duration: 15000,
       });
       
       // Try to send email but don't fail if it doesn't work
@@ -55,9 +68,13 @@ const AdminLogin = () => {
         if (!emailError) {
           console.log('Email sent successfully:', emailData);
           toast.success('OTP sent to your email!');
+        } else {
+          console.warn('Email sending failed:', emailError);
+          toast.warning('Email sending failed, but you can use the OTP shown above');
         }
       } catch (emailError) {
-        console.warn('Email sending failed, but OTP is available in console:', emailError);
+        console.warn('Email sending failed, but OTP is available:', emailError);
+        toast.warning('Email sending failed, but you can use the OTP shown above');
       }
 
       setStep('otp');
@@ -86,7 +103,7 @@ const AdminLogin = () => {
 
       if (error) {
         console.error('OTP verification error:', error);
-        throw error;
+        throw new Error(`OTP verification failed: ${error.message}`);
       }
 
       console.log('OTP verification successful:', data);
@@ -168,6 +185,11 @@ const AdminLogin = () => {
                 >
                   ← Back to email
                 </Button>
+                {generatedOtp && (
+                  <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-sm">
+                    <strong>Development OTP:</strong> {generatedOtp}
+                  </div>
+                )}
               </div>
             )}
             <Button 
@@ -182,7 +204,7 @@ const AdminLogin = () => {
           {/* Development helper */}
           <div className="mt-4 p-3 bg-yellow-50/80 dark:bg-yellow-900/20 border border-yellow-200/60 dark:border-yellow-800/60 rounded-lg">
             <p className="text-xs text-yellow-800 dark:text-yellow-200">
-              <strong>Development Mode:</strong> The OTP will be shown in the browser console and toast notification for testing purposes.
+              <strong>Development Mode:</strong> The OTP will be shown above and in the browser console for testing purposes.
             </p>
           </div>
         </CardContent>
