@@ -23,41 +23,51 @@ const AdminLogin = () => {
 
     setLoading(true);
     try {
-      console.log('Requesting OTP for:', email);
+      console.log('=== REQUESTING OTP ===');
+      console.log('Email:', email);
       
       // Test database connection first
+      console.log('Testing database connection...');
       const { data: testData, error: testError } = await supabase
         .from('admin_users')
         .select('id')
         .limit(1);
 
       if (testError) {
-        console.error('Database connection test failed:', testError);
+        console.error('❌ Database connection test failed:', testError);
         throw new Error(`Database connection failed: ${testError.message}`);
       }
 
-      console.log('Database connection successful');
+      console.log('✅ Database connection successful');
       
       // Generate OTP using the database function
+      console.log('Calling generate_admin_otp function...');
       const { data: otpToken, error: otpError } = await supabase.rpc('generate_admin_otp', {
         admin_email: email
       });
 
       if (otpError) {
-        console.error('OTP generation error:', otpError);
+        console.error('❌ OTP generation error:', otpError);
+        console.error('OTP error details:', {
+          code: otpError.code,
+          message: otpError.message,
+          details: otpError.details,
+          hint: otpError.hint
+        });
         throw new Error(`OTP generation failed: ${otpError.message}`);
       }
 
-      console.log('OTP generated successfully:', otpToken);
+      console.log('✅ OTP generated successfully:', otpToken);
       setGeneratedOtp(otpToken);
 
-      // For development, show the OTP in console and toast
-      toast.success(`OTP generated successfully! Development OTP: ${otpToken}`, {
+      // Show OTP in development
+      toast.success(`OTP generated! Development OTP: ${otpToken}`, {
         duration: 15000,
       });
       
       // Try to send email but don't fail if it doesn't work
       try {
+        console.log('Attempting to send OTP email...');
         const { data: emailData, error: emailError } = await supabase.functions.invoke('send-admin-otp', {
           body: {
             adminEmail: email,
@@ -66,20 +76,21 @@ const AdminLogin = () => {
         });
 
         if (!emailError) {
-          console.log('Email sent successfully:', emailData);
+          console.log('✅ Email sent successfully:', emailData);
           toast.success('OTP sent to your email!');
         } else {
-          console.warn('Email sending failed:', emailError);
+          console.warn('⚠️ Email sending failed:', emailError);
           toast.warning('Email sending failed, but you can use the OTP shown above');
         }
       } catch (emailError) {
-        console.warn('Email sending failed, but OTP is available:', emailError);
+        console.warn('⚠️ Email sending failed, but OTP is available:', emailError);
         toast.warning('Email sending failed, but you can use the OTP shown above');
       }
 
       setStep('otp');
+      console.log('=== OTP REQUEST COMPLETED ===');
     } catch (error: any) {
-      console.error('Error requesting OTP:', error);
+      console.error('❌ Error requesting OTP:', error);
       toast.error(error.message || 'Failed to generate OTP');
     } finally {
       setLoading(false);
@@ -94,7 +105,8 @@ const AdminLogin = () => {
 
     setLoading(true);
     try {
-      console.log('Verifying OTP:', otp, 'for email:', email);
+      console.log('=== VERIFYING OTP ===');
+      console.log('OTP:', otp, 'Email:', email);
       
       const { data, error } = await supabase.rpc('verify_admin_otp', {
         admin_email: email,
@@ -102,11 +114,17 @@ const AdminLogin = () => {
       });
 
       if (error) {
-        console.error('OTP verification error:', error);
+        console.error('❌ OTP verification error:', error);
+        console.error('Verification error details:', {
+          code: error.code,
+          message: error.message,
+          details: error.details,
+          hint: error.hint
+        });
         throw new Error(`OTP verification failed: ${error.message}`);
       }
 
-      console.log('OTP verification successful:', data);
+      console.log('✅ OTP verification successful:', data);
 
       if (data && data.length > 0) {
         // Store session token in localStorage
@@ -115,11 +133,12 @@ const AdminLogin = () => {
         
         toast.success('Login successful!');
         navigate('/admin');
+        console.log('=== ADMIN LOGIN COMPLETED ===');
       } else {
         throw new Error('Invalid response from server');
       }
     } catch (error: any) {
-      console.error('Error verifying OTP:', error);
+      console.error('❌ Error verifying OTP:', error);
       toast.error(error.message || 'Invalid OTP');
     } finally {
       setLoading(false);
@@ -186,8 +205,12 @@ const AdminLogin = () => {
                   ← Back to email
                 </Button>
                 {generatedOtp && (
-                  <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-sm">
-                    <strong>Development OTP:</strong> {generatedOtp}
+                  <div className="mt-4 p-4 bg-yellow-50 border-2 border-yellow-300 rounded-lg">
+                    <div className="text-center">
+                      <p className="text-sm font-medium text-yellow-800 mb-2">Development OTP:</p>
+                      <p className="text-2xl font-bold text-yellow-900 tracking-wider">{generatedOtp}</p>
+                      <p className="text-xs text-yellow-700 mt-2">Copy this OTP to the field above</p>
+                    </div>
                   </div>
                 )}
               </div>
@@ -202,9 +225,9 @@ const AdminLogin = () => {
           </form>
           
           {/* Development helper */}
-          <div className="mt-4 p-3 bg-yellow-50/80 dark:bg-yellow-900/20 border border-yellow-200/60 dark:border-yellow-800/60 rounded-lg">
-            <p className="text-xs text-yellow-800 dark:text-yellow-200">
-              <strong>Development Mode:</strong> The OTP will be shown above and in the browser console for testing purposes.
+          <div className="mt-4 p-3 bg-blue-50/80 dark:bg-blue-900/20 border border-blue-200/60 dark:border-blue-800/60 rounded-lg">
+            <p className="text-xs text-blue-800 dark:text-blue-200">
+              <strong>Development Mode:</strong> The OTP will be displayed above for easy testing. Check the browser console for detailed logs.
             </p>
           </div>
         </CardContent>
