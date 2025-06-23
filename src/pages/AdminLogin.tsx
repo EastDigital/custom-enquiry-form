@@ -121,7 +121,16 @@ const AdminLogin = () => {
           details: error.details,
           hint: error.hint
         });
-        throw new Error(`OTP verification failed: ${error.message}`);
+        
+        // Provide more specific error messages
+        if (error.message.includes('Invalid or expired OTP')) {
+          toast.error('Invalid or expired OTP. Please request a new one.');
+        } else if (error.message.includes('Admin user not found')) {
+          toast.error('Admin user not found. Please contact support.');
+        } else {
+          toast.error(`OTP verification failed: ${error.message}`);
+        }
+        return;
       }
 
       console.log('✅ OTP verification successful:', data);
@@ -135,7 +144,7 @@ const AdminLogin = () => {
         navigate('/admin');
         console.log('=== ADMIN LOGIN COMPLETED ===');
       } else {
-        throw new Error('Invalid response from server');
+        throw new Error('Invalid response from server - no session data returned');
       }
     } catch (error: any) {
       console.error('❌ Error verifying OTP:', error);
@@ -193,23 +202,42 @@ const AdminLogin = () => {
                   onChange={(e) => setOtp(e.target.value)}
                   placeholder="123456"
                   maxLength={6}
-                  className="h-12 rounded-xl border-slate-200 dark:border-slate-600 focus:border-brand-orange transition-all duration-200"
+                  className="h-12 rounded-xl border-slate-200 dark:border-slate-600 focus:border-brand-orange transition-all duration-200 text-center text-lg font-mono tracking-widest"
                   required
                 />
                 <Button
                   type="button"
                   variant="link"
-                  onClick={() => setStep('email')}
+                  onClick={() => {
+                    setStep('email');
+                    setOtp('');
+                    setGeneratedOtp('');
+                  }}
                   className="p-0 h-auto text-sm"
                 >
                   ← Back to email
                 </Button>
                 {generatedOtp && (
-                  <div className="mt-4 p-4 bg-yellow-50 border-2 border-yellow-300 rounded-lg">
+                  <div className="mt-4 p-6 bg-gradient-to-r from-yellow-50 to-amber-50 border-2 border-yellow-400 rounded-xl shadow-lg">
                     <div className="text-center">
-                      <p className="text-sm font-medium text-yellow-800 mb-2">Development OTP:</p>
-                      <p className="text-2xl font-bold text-yellow-900 tracking-wider">{generatedOtp}</p>
-                      <p className="text-xs text-yellow-700 mt-2">Copy this OTP to the field above</p>
+                      <p className="text-sm font-medium text-yellow-800 mb-3">🔑 Development OTP:</p>
+                      <div className="bg-white p-4 rounded-lg border-2 border-yellow-300 mb-3">
+                        <p className="text-3xl font-bold text-yellow-900 tracking-[0.5em] font-mono">{generatedOtp}</p>
+                      </div>
+                      <p className="text-xs text-yellow-700">Copy this OTP to the field above</p>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setOtp(generatedOtp);
+                          navigator.clipboard.writeText(generatedOtp);
+                          toast.success('OTP copied to clipboard!');
+                        }}
+                        className="mt-2 border-yellow-400 text-yellow-800 hover:bg-yellow-100"
+                      >
+                        📋 Copy OTP
+                      </Button>
                     </div>
                   </div>
                 )}
@@ -220,7 +248,14 @@ const AdminLogin = () => {
               className="w-full bg-gradient-to-r from-brand-orange to-brand-dark-orange rounded-xl h-12"
               disabled={loading}
             >
-              {loading ? 'Processing...' : step === 'email' ? 'Send OTP' : 'Verify & Login'}
+              {loading ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Processing...
+                </div>
+              ) : (
+                step === 'email' ? 'Send OTP' : 'Verify & Login'
+              )}
             </Button>
           </form>
           
