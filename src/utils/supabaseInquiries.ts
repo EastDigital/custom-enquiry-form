@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { CustomerFormData } from '@/types/form';
 
@@ -9,20 +10,6 @@ export const saveCustomerInquiry = async (
     console.log('=== STARTING CUSTOMER INQUIRY SAVE ===');
     console.log('Form data:', formData);
     console.log('Instant proposal:', instantProposal);
-
-    // Test database connection first
-    console.log('Testing database connection...');
-    const { data: testData, error: testError } = await supabase
-      .from('services')
-      .select('id')
-      .limit(1);
-
-    if (testError) {
-      console.error('❌ Database connection test failed:', testError);
-      throw new Error(`Database connection failed: ${testError.message}`);
-    }
-
-    console.log('✅ Database connection successful');
 
     // Calculate total amount
     let totalAmount = 0;
@@ -48,7 +35,7 @@ export const saveCustomerInquiry = async (
 
     console.log('Prepared inquiry data:', inquiryData);
 
-    // Insert customer inquiry with detailed error handling
+    // Insert customer inquiry
     console.log('Inserting customer inquiry...');
     const { data: inquiry, error: inquiryError } = await supabase
       .from('customer_inquiries')
@@ -58,12 +45,6 @@ export const saveCustomerInquiry = async (
 
     if (inquiryError) {
       console.error('❌ Error inserting inquiry:', inquiryError);
-      console.error('Error details:', {
-        code: inquiryError.code,
-        message: inquiryError.message,
-        details: inquiryError.details,
-        hint: inquiryError.hint
-      });
       throw new Error(`Failed to save inquiry: ${inquiryError.message}`);
     }
 
@@ -78,8 +59,8 @@ export const saveCustomerInquiry = async (
         service_id: service.serviceId,
         sub_service_id: service.subServiceId,
         quantity: service.quantity || 1,
-        unit_price: 0, // Backend will calculate
-        total_price: 0, // Backend will calculate
+        unit_price: 0, // Will be calculated by admin
+        total_price: 0, // Will be calculated by admin
       }));
 
       console.log('Service inserts data:', serviceInserts);
@@ -91,12 +72,6 @@ export const saveCustomerInquiry = async (
 
       if (servicesError) {
         console.error('❌ Error saving services:', servicesError);
-        console.error('Services error details:', {
-          code: servicesError.code,
-          message: servicesError.message,
-          details: servicesError.details,
-          hint: servicesError.hint
-        });
         // Don't throw here, inquiry is already saved
         console.warn('⚠️ Services could not be saved, but inquiry was successful');
       } else {
@@ -108,7 +83,6 @@ export const saveCustomerInquiry = async (
     return inquiry;
   } catch (error) {
     console.error('❌ Error in saveCustomerInquiry:', error);
-    console.error('Error stack:', error.stack);
     throw error;
   }
 };

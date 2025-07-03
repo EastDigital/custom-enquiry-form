@@ -15,6 +15,7 @@ export const useServices = () => {
   const fetchServices = async () => {
     try {
       setLoading(true);
+      console.log('Fetching services and sub-services...');
       
       // Fetch services and sub_services in a single query with join
       const { data: services, error: servicesError } = await supabase
@@ -39,8 +40,11 @@ export const useServices = () => {
         .order('display_order');
 
       if (servicesError) {
+        console.error('Error fetching services:', servicesError);
         throw servicesError;
       }
+
+      console.log('Services fetched successfully:', services);
 
       // Transform the data to match the existing ServiceCategory interface
       const transformedCategories: ServiceCategory[] = services?.map(service => ({
@@ -49,12 +53,13 @@ export const useServices = () => {
         subServices: service.sub_services?.map((subService: any) => ({
           id: subService.id,
           name: subService.name,
-          price: parseFloat(subService.price),
+          price: parseFloat(subService.price || '0'),
           unit: subService.unit,
           minimumUnits: subService.minimum_units,
         } as SubService)) || [],
       })) || [];
 
+      console.log('Transformed categories:', transformedCategories);
       setServiceCategories(transformedCategories);
     } catch (err) {
       console.error('Error fetching services:', err);
